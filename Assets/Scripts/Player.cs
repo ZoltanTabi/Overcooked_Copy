@@ -8,6 +8,9 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float rotateSpeed = 10f;
 
+    [SerializeField]
+    private GameInput gameInput;
+
     private bool isWalking = false;
 
     private void Update()
@@ -34,9 +37,7 @@ public class Player : MonoBehaviour
 
     private Vector3 GetMoveDirection()
     {
-        var inputVector = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-
-        inputVector = inputVector.normalized;
+        var inputVector = gameInput.GetMovementVectorNormalized();
 
         return new Vector3(inputVector.x, 0, inputVector.y);
     }
