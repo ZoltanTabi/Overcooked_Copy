@@ -8,15 +8,28 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float rotateSpeed = 10f;
 
+    private bool isWalking = false;
+
     private void Update()
     {
         Vector3 moveDirection = GetMoveDirection();
 
         if (moveDirection != Vector3.zero)
         {
+            isWalking = true;
+
             Move(moveDirection);
             Rotate(moveDirection);
         }
+        else
+        {
+            isWalking = false;
+        }
+    }
+
+    public bool IsWalking()
+    {
+        return isWalking;
     }
 
     private Vector3 GetMoveDirection()
