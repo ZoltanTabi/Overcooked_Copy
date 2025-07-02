@@ -5,18 +5,36 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float moveSpeed = 5f;
 
+    [SerializeField]
+    private float rotateSpeed = 10f;
+
     private void Update()
     {
-        Move();
+        Vector3 moveDirection = GetMoveDirection();
+
+        if (moveDirection != Vector3.zero)
+        {
+            Move(moveDirection);
+            Rotate(moveDirection);
+        }
     }
 
-    private void Move()
+    private Vector3 GetMoveDirection()
     {
         var inputVector = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 
         inputVector = inputVector.normalized;
 
-        var moveDir = new Vector3(inputVector.x, 0, inputVector.y);
-        transform.position += moveSpeed * Time.deltaTime * moveDir;
+        return new Vector3(inputVector.x, 0, inputVector.y);
+    }
+
+    private void Move(Vector3 moveDirection)
+    {
+        transform.position += moveSpeed * Time.deltaTime * moveDirection;
+    }
+
+    private void Rotate(Vector3 moveDirection)
+    {
+        transform.forward = Vector3.Slerp(transform.forward, moveDirection, rotateSpeed * Time.deltaTime);
     }
 }
