@@ -50,6 +50,6 @@ public class GameInput : MonoBehaviour
     
     private void Interact_performed(CallbackContext context)
     {
-        OnInteractAction();
+        OnInteractAction?.Invoke();
     }
 }

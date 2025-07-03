@@ -1,7 +1,10 @@
+using System;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public static Player Instance { get; private set; }
+
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float rotateSpeed = 10f;
     [SerializeField] private GameInput gameInput;
@@ -9,8 +12,23 @@ public class Player : MonoBehaviour
 
     private bool isWalking = false;
     private Vector3 lastInteractDirection = Vector3.zero;
+    private ClearCounter selectedCounter;
 
     private float MoveDistance => moveSpeed * Time.deltaTime;
+
+    public event Action<ClearCounter> OnCounterSelected;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     private void Start()
     {
@@ -33,7 +51,7 @@ public class Player : MonoBehaviour
             isWalking = false;
         }
 
-        //HandleInteractions();
+        HandleInteractions();
     }
 
     public bool IsWalking()
@@ -89,45 +107,44 @@ public class Player : MonoBehaviour
         transform.forward = Vector3.Slerp(transform.forward, moveDirection, rotateSpeed * Time.deltaTime);
     }
 
-    //private void HandleInteractions()
-    //{
-    //    var inputVector = gameInput.GetMovementVectorNormalized();
-    //    var moveDirection = new Vector3(inputVector.x, 0, inputVector.y);
-
-    //    if (moveDirection != Vector3.zero)
-    //    {
-    //        lastInteractDirection = moveDirection.normalized;
-    //    }
-
-    //    float interactDistance = 2f;
-        
-    //    if (Physics.Raycast(transform.position, lastInteractDirection, out RaycastHit hit, interactDistance, counterLayerMask))
-    //    {
-    //        if (hit.transform.TryGetComponent(out ClearCounter clearCounter))
-    //        {
-    //            //clearCounter.Interact();
-    //        }
-    //    }
-    //}
-
-    private void GameInput_OnInteractAction()
+    private void HandleInteractions()
     {
-    //    var inputVector = gameInput.GetMovementVectorNormalized();
-    //    var moveDirection = new Vector3(inputVector.x, 0, inputVector.y);
-
-    //    if (moveDirection != Vector3.zero)
-    //    {
-    //        lastInteractDirection = moveDirection.normalized;
-    //    }
-
         float interactDistance = 2f;
 
         if (Physics.Raycast(transform.position, lastInteractDirection, out RaycastHit hit, interactDistance, counterLayerMask))
         {
             if (hit.transform.TryGetComponent(out ClearCounter clearCounter))
             {
-                clearCounter.Interact();
+                SetSelectedCounter(clearCounter);
             }
+            else
+            {
+                SetSelectedCounter(null);
+            }
+        }
+        else
+        {
+            SetSelectedCounter(null);
+        }
+    }
+
+    private void SetSelectedCounter(ClearCounter selectedCounter)
+    {
+        if (this.selectedCounter == selectedCounter)
+        {
+            return;
+        }
+
+        this.selectedCounter = selectedCounter;
+
+        OnCounterSelected?.Invoke(selectedCounter);
+    }
+
+    private void GameInput_OnInteractAction()
+    {
+        if (selectedCounter != null)
+        {
+            selectedCounter.Interact();
         }
     }
 }
