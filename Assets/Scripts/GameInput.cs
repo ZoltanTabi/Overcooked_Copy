@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using static UnityEngine.InputSystem.InputAction;
 
@@ -8,6 +9,8 @@ public class GameInput : MonoBehaviour
     private Vector2 inputVector;
     private Vector2 normalizedInputVector;
 
+    public event Action OnInteractAction;
+
     private void Awake()
     {
         playerInputActions = new PlayerInputActions();
@@ -16,6 +19,8 @@ public class GameInput : MonoBehaviour
 
         playerInputActions.Player.Move.performed += OnMove;
         playerInputActions.Player.Move.canceled += OnMoveCanceled;
+
+        playerInputActions.Player.Interact.performed += Interact_performed;
     }
 
     private void OnDestroy()
@@ -41,5 +46,10 @@ public class GameInput : MonoBehaviour
     {
         inputVector = Vector2.zero;
         normalizedInputVector = Vector2.zero;
+    }
+    
+    private void Interact_performed(CallbackContext context)
+    {
+        OnInteractAction();
     }
 }

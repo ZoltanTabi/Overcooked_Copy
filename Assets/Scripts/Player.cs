@@ -12,6 +12,11 @@ public class Player : MonoBehaviour
 
     private float MoveDistance => moveSpeed * Time.deltaTime;
 
+    private void Start()
+    {
+        gameInput.OnInteractAction += GameInput_OnInteractAction;
+    }
+
     private void Update()
     {
         Vector3 moveDirection = GetMoveDirection();
@@ -28,7 +33,7 @@ public class Player : MonoBehaviour
             isWalking = false;
         }
 
-        HandleInteractions();
+        //HandleInteractions();
     }
 
     public bool IsWalking()
@@ -40,6 +45,11 @@ public class Player : MonoBehaviour
     {
         var inputVector = gameInput.GetMovementVectorNormalized();
         var moveDirection = new Vector3(inputVector.x, 0, inputVector.y);
+
+        if (moveDirection != Vector3.zero)
+        {
+            lastInteractDirection = moveDirection.normalized;
+        }
 
         float playerRadius = 0.7f; // Adjust based on your player model size
         float playerHeight = 2f; // Adjust based on your player model height
@@ -79,18 +89,39 @@ public class Player : MonoBehaviour
         transform.forward = Vector3.Slerp(transform.forward, moveDirection, rotateSpeed * Time.deltaTime);
     }
 
-    private void HandleInteractions()
-    {
-        var inputVector = gameInput.GetMovementVectorNormalized();
-        var moveDirection = new Vector3(inputVector.x, 0, inputVector.y);
+    //private void HandleInteractions()
+    //{
+    //    var inputVector = gameInput.GetMovementVectorNormalized();
+    //    var moveDirection = new Vector3(inputVector.x, 0, inputVector.y);
 
-        if (moveDirection != Vector3.zero)
-        {
-            lastInteractDirection = moveDirection.normalized;
-        }
+    //    if (moveDirection != Vector3.zero)
+    //    {
+    //        lastInteractDirection = moveDirection.normalized;
+    //    }
+
+    //    float interactDistance = 2f;
+        
+    //    if (Physics.Raycast(transform.position, lastInteractDirection, out RaycastHit hit, interactDistance, counterLayerMask))
+    //    {
+    //        if (hit.transform.TryGetComponent(out ClearCounter clearCounter))
+    //        {
+    //            //clearCounter.Interact();
+    //        }
+    //    }
+    //}
+
+    private void GameInput_OnInteractAction()
+    {
+    //    var inputVector = gameInput.GetMovementVectorNormalized();
+    //    var moveDirection = new Vector3(inputVector.x, 0, inputVector.y);
+
+    //    if (moveDirection != Vector3.zero)
+    //    {
+    //        lastInteractDirection = moveDirection.normalized;
+    //    }
 
         float interactDistance = 2f;
-        
+
         if (Physics.Raycast(transform.position, lastInteractDirection, out RaycastHit hit, interactDistance, counterLayerMask))
         {
             if (hit.transform.TryGetComponent(out ClearCounter clearCounter))
