@@ -2,16 +2,13 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField]
-    private float moveSpeed = 5f;
-
-    [SerializeField]
-    private float rotateSpeed = 10f;
-
-    [SerializeField]
-    private GameInput gameInput;
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float rotateSpeed = 10f;
+    [SerializeField] private GameInput gameInput;
+    [SerializeField] private LayerMask counterLayerMask;
 
     private bool isWalking = false;
+    private Vector3 lastInteractDirection = Vector3.zero;
 
     private float MoveDistance => moveSpeed * Time.deltaTime;
 
@@ -30,6 +27,8 @@ public class Player : MonoBehaviour
         {
             isWalking = false;
         }
+
+        HandleInteractions();
     }
 
     public bool IsWalking()
@@ -78,5 +77,26 @@ public class Player : MonoBehaviour
     private void Rotate(Vector3 moveDirection)
     {
         transform.forward = Vector3.Slerp(transform.forward, moveDirection, rotateSpeed * Time.deltaTime);
+    }
+
+    private void HandleInteractions()
+    {
+        var inputVector = gameInput.GetMovementVectorNormalized();
+        var moveDirection = new Vector3(inputVector.x, 0, inputVector.y);
+
+        if (moveDirection != Vector3.zero)
+        {
+            lastInteractDirection = moveDirection.normalized;
+        }
+
+        float interactDistance = 2f;
+        
+        if (Physics.Raycast(transform.position, lastInteractDirection, out RaycastHit hit, interactDistance, counterLayerMask))
+        {
+            if (hit.transform.TryGetComponent(out ClearCounter clearCounter))
+            {
+                clearCounter.Interact();
+            }
+        }
     }
 }
