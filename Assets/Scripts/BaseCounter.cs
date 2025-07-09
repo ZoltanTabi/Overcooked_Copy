@@ -6,7 +6,23 @@ public class BaseCounter : MonoBehaviour, IKitchenObjectParent
 
     private KitchenObject kitchenObject;
 
-    public virtual void Interact(Player player) { }
+    public virtual bool Interact(Player player)
+    {
+        if (!HasKitchenObject() && player.HasKitchenObject())
+        {
+            player.GetKitchenObject().SetKitchenObjectParent(this);
+
+            return true;
+        }
+        else if (HasKitchenObject() && !player.HasKitchenObject())
+        {
+            GetKitchenObject().SetKitchenObjectParent(player);
+
+            return true;
+        }
+
+        return false;
+    }
 
     public Transform GetKitchenObjectFollowTransform()
     {
