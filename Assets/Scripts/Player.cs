@@ -13,12 +13,12 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private bool isWalking = false;
     private Vector3 lastInteractDirection = Vector3.zero;
-    private ClearCounter selectedCounter;
+    private BaseCounter selectedCounter;
     private KitchenObject kitchenObject;
 
     private float MoveDistance => moveSpeed * Time.deltaTime;
 
-    public event Action<ClearCounter> OnCounterSelected;
+    public event Action<BaseCounter> OnCounterSelected;
 
     private void Awake()
     {
@@ -115,9 +115,9 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
         if (Physics.Raycast(transform.position, lastInteractDirection, out RaycastHit hit, interactDistance, counterLayerMask))
         {
-            if (hit.transform.TryGetComponent(out ClearCounter clearCounter))
+            if (hit.transform.TryGetComponent(out BaseCounter baseCounter))
             {
-                SetSelectedCounter(clearCounter);
+                SetSelectedCounter(baseCounter);
             }
             else
             {
@@ -130,7 +130,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         }
     }
 
-    private void SetSelectedCounter(ClearCounter selectedCounter)
+    private void SetSelectedCounter(BaseCounter selectedCounter)
     {
         if (this.selectedCounter == selectedCounter)
         {
