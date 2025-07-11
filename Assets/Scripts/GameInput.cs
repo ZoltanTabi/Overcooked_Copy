@@ -10,6 +10,7 @@ public class GameInput : MonoBehaviour
     private Vector2 normalizedInputVector;
 
     public event Action OnInteractAction;
+    public event Action OnInteractAlternateAction;
 
     private void Awake()
     {
@@ -21,6 +22,8 @@ public class GameInput : MonoBehaviour
         playerInputActions.Player.Move.canceled += OnMoveCanceled;
 
         playerInputActions.Player.Interact.performed += Interact_performed;
+
+        playerInputActions.Player.InteractAlternate.performed += InteractAlternate_performed;
     }
 
     private void OnDestroy()
@@ -51,5 +54,10 @@ public class GameInput : MonoBehaviour
     private void Interact_performed(CallbackContext context)
     {
         OnInteractAction?.Invoke();
+    }
+
+    private void InteractAlternate_performed(CallbackContext context)
+    {
+        OnInteractAlternateAction?.Invoke();
     }
 }
