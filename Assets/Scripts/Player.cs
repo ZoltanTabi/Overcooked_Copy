@@ -46,14 +46,14 @@ public class Player : MonoBehaviour, IKitchenObjectParent
             isWalking = true;
 
             Move(moveDirection);
-            Rotate(moveDirection);
         }
         else
         {
             isWalking = false;
         }
 
-        HandleInteractions();
+        Rotate(lastInteractDirection);
+        HandleAvailableInteractions();
     }
 
     public bool IsWalking()
@@ -71,32 +71,32 @@ public class Player : MonoBehaviour, IKitchenObjectParent
             lastInteractDirection = moveDirection.normalized;
         }
 
-        float playerRadius = 0.7f; // Adjust based on your player model size
-        float playerHeight = 2f; // Adjust based on your player model height
-        bool canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirection, MoveDistance);
+        float playerRadius = 0.7f;
+        float playerHeight = 2f;
 
-        if (!canMove)
+        // Try full movement, then X, then Z
+        Vector3[] directions = {
+            moveDirection,
+            new Vector3(moveDirection.x, 0, 0).normalized,
+            new Vector3(0, 0, moveDirection.z).normalized
+        };
+
+        foreach (var direction in directions)
         {
-            var moveDirectionX = new Vector3(moveDirection.x, 0, 0).normalized;
-            canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirectionX, MoveDistance);
+            if (direction == Vector3.zero)
+            {
+                continue;
+            }
+
+            bool canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, direction, MoveDistance);
 
             if (canMove)
             {
-                moveDirection = moveDirectionX;
-            }
-            else
-            {
-                var moveDirectionZ = new Vector3(0, 0, moveDirection.z).normalized;
-                canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirectionZ, MoveDistance);
-
-                if (canMove)
-                {
-                    moveDirection = moveDirectionZ;
-                }
+                return direction;
             }
         }
 
-        return canMove ? moveDirection : Vector3.zero;
+        return Vector3.zero;
     }
 
     private void Move(Vector3 moveDirection)
@@ -109,7 +109,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         transform.forward = Vector3.Slerp(transform.forward, moveDirection, rotateSpeed * Time.deltaTime);
     }
 
-    private void HandleInteractions()
+    private void HandleAvailableInteractions()
     {
         float interactDistance = 2f;
 
