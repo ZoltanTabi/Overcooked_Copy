@@ -53,7 +53,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
             isWalking = false;
         }
 
-        Rotate(lastInteractDirection);
+        Rotate();
         HandleAvailableInteractions();
     }
 
@@ -105,9 +105,14 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         transform.position += MoveDistance * moveDirection;
     }
 
-    private void Rotate(Vector3 moveDirection)
+    private void Rotate()
     {
-        transform.forward = Vector3.Slerp(transform.forward, moveDirection, rotateSpeed * Time.deltaTime);
+        if (lastInteractDirection == Vector3.zero)
+        {
+            return;
+        }
+
+        transform.forward = Vector3.Slerp(transform.forward, lastInteractDirection, rotateSpeed * Time.deltaTime);
     }
 
     private void HandleAvailableInteractions()
