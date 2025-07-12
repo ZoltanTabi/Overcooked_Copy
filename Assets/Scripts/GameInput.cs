@@ -1,13 +1,19 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using static UnityEngine.InputSystem.InputAction;
 
 public class GameInput : MonoBehaviour
 {
+    private const float INPUT_HOLD_TIME = 0.6f;
+
     private PlayerInputActions playerInputActions;
 
     private Vector2 inputVector;
     private Vector2 normalizedInputVector;
+
+    private bool interactAlternateHeld = false;
+    private Coroutine interactAlternateHeldCoroutine;
 
     public event Action OnInteractAction;
     public event Action OnInteractAlternateAction;
@@ -24,6 +30,7 @@ public class GameInput : MonoBehaviour
         playerInputActions.Player.Interact.performed += Interact_performed;
 
         playerInputActions.Player.InteractAlternate.performed += InteractAlternate_performed;
+        playerInputActions.Player.InteractAlternate.canceled += InteractAlternate_canceled;
     }
 
     private void OnDestroy()
@@ -58,6 +65,30 @@ public class GameInput : MonoBehaviour
 
     private void InteractAlternate_performed(CallbackContext context)
     {
-        OnInteractAlternateAction?.Invoke();
+        if (!interactAlternateHeld)
+        {
+            interactAlternateHeld = true;
+            interactAlternateHeldCoroutine = StartCoroutine(FireInteractAlternateRepeatedly());
+        }
+    }
+
+    private void InteractAlternate_canceled(CallbackContext context)
+    {
+        interactAlternateHeld = false;
+
+        if (interactAlternateHeldCoroutine != null)
+        {
+            StopCoroutine(interactAlternateHeldCoroutine);
+            interactAlternateHeldCoroutine = null;
+        }
+    }
+
+    private IEnumerator FireInteractAlternateRepeatedly()
+    {
+        while (interactAlternateHeld)
+        {
+            OnInteractAlternateAction?.Invoke();
+            yield return new WaitForSeconds(INPUT_HOLD_TIME);
+        }
     }
 }
