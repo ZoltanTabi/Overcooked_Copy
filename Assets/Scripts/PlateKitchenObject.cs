@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,7 +7,9 @@ public class PlateKitchenObject : KitchenObject
 {
     [SerializeField] private KitchenObjectSO[] validKitchenObjectSOs;
 
-    private List<KitchenObjectSO> kitchenObjectSOs = new();
+    private readonly List<KitchenObjectSO> kitchenObjectSOs = new();
+
+    public event Action<KitchenObjectSO> OnIngredientAdded;
 
     public bool TryAddIngredient(KitchenObjectSO kitchenObjectSO)
     {
@@ -16,6 +19,7 @@ public class PlateKitchenObject : KitchenObject
         }
 
         kitchenObjectSOs.Add(kitchenObjectSO);
+        OnIngredientAdded?.Invoke(kitchenObjectSO);
 
         return true;
     }
