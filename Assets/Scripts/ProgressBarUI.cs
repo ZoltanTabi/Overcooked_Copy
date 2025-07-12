@@ -3,19 +3,29 @@ using UnityEngine.UI;
 
 public class ProgressBarUI : MonoBehaviour
 {
-    [SerializeField] private CuttingCounter cuttingCounter;
+    [SerializeField] private GameObject hasProgressGameObject;
     [SerializeField] private Image progressBarImage;
+
+    private IHasProgress hasProgress;
 
     private void Start()
     {
+        hasProgress = hasProgressGameObject.GetComponent<IHasProgress>();
+
+        if (hasProgress == null)
+        {
+            Debug.LogError("IHasProgress component not found on the specified GameObject.: " + hasProgressGameObject);
+            return;
+        }
+
         progressBarImage.fillAmount = 0f;
 
-        cuttingCounter.OnProgressChanged += CuttingCounter_OnProgressChanged;
+        hasProgress.OnProgressChanged += HasProgress_OnProgressChanged;
 
         Hide();
     }
 
-    private void CuttingCounter_OnProgressChanged(float progressNormalized)
+    private void HasProgress_OnProgressChanged(float progressNormalized)
     {
         progressBarImage.fillAmount = progressNormalized;
 
