@@ -47,9 +47,14 @@ public class CuttingCounter : BaseCounter
         return false;
     }
 
+    private CuttingRecipeSO GetCuttingRecipeForInput(KitchenObjectSO inputKitchenObjectSO)
+    {
+        return cuttingRecipeSOs.FirstOrDefault(x => x.input == inputKitchenObjectSO);
+    }
+
     private bool TryGetCuttingRecipeForInput(KitchenObjectSO inputKitchenObjectSO, out CuttingRecipeSO cuttingRecipeSO)
     {
-        cuttingRecipeSO = cuttingRecipeSOs.FirstOrDefault(x => x.input == inputKitchenObjectSO);
+        cuttingRecipeSO = GetCuttingRecipeForInput(inputKitchenObjectSO);
 
         return cuttingRecipeSO != null;
     }
