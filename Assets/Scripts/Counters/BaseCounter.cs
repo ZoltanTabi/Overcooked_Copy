@@ -20,6 +20,24 @@ public class BaseCounter : MonoBehaviour, IKitchenObjectParent
 
             return true;
         }
+        else if (HasKitchenObject() && player.HasKitchenObject() && player.GetKitchenObject().TryGetPlate(out var plateKitchenObject))
+        {
+            if (plateKitchenObject.TryAddIngredient(GetKitchenObject().GetKitchenObjectSO()))
+            {
+                GetKitchenObject().DestroySelf();
+
+                return true;
+            }
+        }
+        else if (HasKitchenObject() && player.HasKitchenObject() && GetKitchenObject().TryGetPlate(out plateKitchenObject))
+        {
+            if (plateKitchenObject.TryAddIngredient(player.GetKitchenObject().GetKitchenObjectSO()))
+            {
+                player.GetKitchenObject().DestroySelf();
+
+                return true;
+            }
+        }
 
         return false;
     }
