@@ -17,16 +17,6 @@ public class DeliveryManagerSingleUI : MonoBehaviour
     {
         recipeNameText.text = recipeSO.recipeName;
 
-        //foreach (Transform child in iconContainer)
-        //{
-        //    if (child == iconTemplate)
-        //    {
-        //        continue;
-        //    }
-
-        //    Destroy(child.gameObject);
-        //}
-
         foreach (KitchenObjectSO kitchenObjectSO in recipeSO.kitchenObjectSOs)
         {
             Transform iconTransform = Instantiate(iconTemplate, iconContainer);

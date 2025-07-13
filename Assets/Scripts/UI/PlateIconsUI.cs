@@ -18,27 +18,7 @@ public class PlateIconsUI : MonoBehaviour
     private void PlateKitchenObject_OnIngredientAdded(KitchenObjectSO kitchenObjectSO)
     {
         AddIcon(kitchenObjectSO);
-
-        //UpdateVisual();
     }
-
-    //private void UpdateVisual()
-    //{
-    //    foreach (Transform child in transform)
-    //    {
-    //        if (child == iconTemplate)
-    //        {
-    //            continue;
-    //        }
-
-    //        Destroy(child.gameObject);
-    //    }
-
-    //    foreach (KitchenObjectSO kitchenObjectSO in plateKitchenObject.GetKitchenObjectSOs())
-    //    {
-    //        AddIcon(kitchenObjectSO);
-    //    }
-    //}
 
     private void AddIcon(KitchenObjectSO kitchenObjectSO)
     {
