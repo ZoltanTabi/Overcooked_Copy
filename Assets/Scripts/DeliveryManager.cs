@@ -16,6 +16,8 @@ public class DeliveryManager : MonoBehaviour
 
     public event Action OnRecipeSpawned;
     public event Action OnRecipeDelivered;
+    public event Action OnRecipeSuccess;
+    public event Action OnRecipeFailed;
 
     private void Awake()
     {
@@ -46,7 +48,6 @@ public class DeliveryManager : MonoBehaviour
         }
 
         RecipeSO waitingRecipeSO = recipeListSO.recipeSOs[UnityEngine.Random.Range(0, recipeListSO.recipeSOs.Count)];
-        Debug.Log($"New recipe: {waitingRecipeSO.recipeName}");
         waitingRecipeSOs.Add(waitingRecipeSO);
 
         OnRecipeSpawned?.Invoke();
@@ -59,14 +60,15 @@ public class DeliveryManager : MonoBehaviour
 
         if (waitingRecipeSO == null)
         {
-            Debug.Log("Recipe not found for delivery.");
+            OnRecipeFailed?.Invoke();
+
             return;
         }
 
-        Debug.Log($"Recipe delivered: {waitingRecipeSO.recipeName}");
         waitingRecipeSOs.Remove(waitingRecipeSO);
 
         OnRecipeDelivered?.Invoke();
+        OnRecipeSuccess?.Invoke();
     }
 
     public List<RecipeSO> GetWaitingRecipeSOs()

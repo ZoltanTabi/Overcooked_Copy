@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class BaseCounter : MonoBehaviour, IKitchenObjectParent
@@ -5,6 +6,8 @@ public class BaseCounter : MonoBehaviour, IKitchenObjectParent
     [SerializeField] private Transform counterTopPoint;
 
     private KitchenObject kitchenObject;
+
+    public static event Action<BaseCounter> OnAnyObjectPlacedOnCounter;
 
     public virtual bool Interact(Player player)
     {
@@ -55,6 +58,11 @@ public class BaseCounter : MonoBehaviour, IKitchenObjectParent
     public void SetKitchenObject(KitchenObject kitchenObject)
     {
         this.kitchenObject = kitchenObject;
+
+        if (this is not TrashCounter && kitchenObject != null)
+        {
+            OnAnyObjectPlacedOnCounter?.Invoke(this);
+        }
     }
 
     public KitchenObject GetKitchenObject()

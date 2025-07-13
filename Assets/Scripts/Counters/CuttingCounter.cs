@@ -8,6 +8,8 @@ public class CuttingCounter : BaseCounter, IHasProgress
 
     private int cuttingProgress;
 
+    public static event Action<CuttingCounter> OnAnyCut;
+
     public event Action<float> OnProgressChanged;
     public event Action OnCut;
 
@@ -30,6 +32,8 @@ public class CuttingCounter : BaseCounter, IHasProgress
             ++cuttingProgress;
 
             OnCut?.Invoke();
+            OnAnyCut?.Invoke(this);
+
             InvokeProgressChanged(cuttingRecipeSO.cuttingProgressMax);
 
             if (cuttingProgress < cuttingRecipeSO.cuttingProgressMax)

@@ -5,7 +5,7 @@ using static UnityEngine.InputSystem.InputAction;
 
 public class GameInput : MonoBehaviour
 {
-    private const float INPUT_HOLD_TIME = 0.6f;
+    private const float INTERACT_ALTERNATE_FIRE_TIME = 0.5f;
 
     private PlayerInputActions playerInputActions;
 
@@ -88,7 +88,7 @@ public class GameInput : MonoBehaviour
         while (interactAlternateHeld)
         {
             OnInteractAlternateAction?.Invoke();
-            yield return new WaitForSeconds(INPUT_HOLD_TIME);
+            yield return new WaitForSeconds(INTERACT_ALTERNATE_FIRE_TIME);
         }
     }
 }

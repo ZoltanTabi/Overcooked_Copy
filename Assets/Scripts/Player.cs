@@ -19,6 +19,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     private float MoveDistance => moveSpeed * Time.deltaTime;
 
     public event Action<BaseCounter> OnCounterSelected;
+    public event Action OnPickSomething;
 
     private void Awake()
     {
@@ -75,7 +76,6 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         float playerRadius = 0.7f;
         float playerHeight = 2f;
 
-        // Try full movement, then X, then Z
         Vector3[] directions = {
             moveDirection,
             new Vector3(moveDirection.x, 0, 0).normalized,
@@ -172,6 +172,11 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     public void SetKitchenObject(KitchenObject kitchenObject)
     {
         this.kitchenObject = kitchenObject;
+
+        if (kitchenObject != null)
+        {
+            OnPickSomething?.Invoke();
+        }
     }
 
     public KitchenObject GetKitchenObject()

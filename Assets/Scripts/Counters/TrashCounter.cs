@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using UnityEngine;
 
 public class TrashCounter : BaseCounter
@@ -6,6 +6,8 @@ public class TrashCounter : BaseCounter
     [SerializeField] private Transform counterBottomPoint;
 
     private float fallSpeed = 0f;
+
+    public static event Action<TrashCounter> OnAnyObjectPlacedInTrashCounter;
 
     private void Update()
     {
@@ -34,6 +36,7 @@ public class TrashCounter : BaseCounter
             fallSpeed = 0f;
 
             player.GetKitchenObject().SetKitchenObjectParent(this);
+            OnAnyObjectPlacedInTrashCounter?.Invoke(this);
 
             return true;
         }
