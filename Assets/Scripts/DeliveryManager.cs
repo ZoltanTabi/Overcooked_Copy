@@ -13,6 +13,7 @@ public class DeliveryManager : MonoBehaviour
     private float spawnRecipeTimer;
     private readonly float spawnRecipeTimerMax = 4f;
     private readonly int waitingRecipesMax = 4;
+    private int successfulRecipesAmount = 0;
 
     public event Action OnRecipeSpawned;
     public event Action OnRecipeDelivered;
@@ -70,6 +71,7 @@ public class DeliveryManager : MonoBehaviour
             return;
         }
 
+        ++successfulRecipesAmount;
         waitingRecipeSOs.Remove(waitingRecipeSO);
 
         OnRecipeDelivered?.Invoke();
@@ -79,5 +81,10 @@ public class DeliveryManager : MonoBehaviour
     public List<RecipeSO> GetWaitingRecipeSOs()
     {
         return waitingRecipeSOs;
+    }
+
+    public int GetSuccessfulRecipesAmount()
+    {
+        return successfulRecipesAmount;
     }
 }
