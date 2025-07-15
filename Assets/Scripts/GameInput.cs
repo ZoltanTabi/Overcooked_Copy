@@ -5,6 +5,8 @@ using static UnityEngine.InputSystem.InputAction;
 
 public class GameInput : MonoBehaviour
 {
+    public static GameInput Instance { get; private set; }
+
     private const float INTERACT_ALTERNATE_FIRE_TIME = 0.5f;
 
     private PlayerInputActions playerInputActions;
@@ -17,9 +19,20 @@ public class GameInput : MonoBehaviour
 
     public event Action OnInteractAction;
     public event Action OnInteractAlternateAction;
+    public event Action OnPauseAction;
 
     private void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         playerInputActions = new PlayerInputActions();
 
         playerInputActions.Player.Enable();
@@ -31,14 +44,22 @@ public class GameInput : MonoBehaviour
 
         playerInputActions.Player.InteractAlternate.performed += InteractAlternate_performed;
         playerInputActions.Player.InteractAlternate.canceled += InteractAlternate_canceled;
+
+        playerInputActions.Player.Pause.performed += Pause_performed;
     }
 
     private void OnDestroy()
     {
         playerInputActions.Player.Move.performed -= OnMove;
         playerInputActions.Player.Move.canceled -= OnMoveCanceled;
+        playerInputActions.Player.Interact.performed -= Interact_performed;
+        playerInputActions.Player.InteractAlternate.performed -= InteractAlternate_performed;
+        playerInputActions.Player.InteractAlternate.canceled -= InteractAlternate_canceled;
+        playerInputActions.Player.Pause.performed -= Pause_performed;
 
         playerInputActions.Player.Disable();
+
+        playerInputActions.Dispose();
     }
 
     public Vector2 GetMovementVectorNormalized()
@@ -90,5 +111,10 @@ public class GameInput : MonoBehaviour
             OnInteractAlternateAction?.Invoke();
             yield return new WaitForSeconds(INTERACT_ALTERNATE_FIRE_TIME);
         }
+    }
+
+    private void Pause_performed(CallbackContext context)
+    {
+        OnPauseAction?.Invoke();
     }
 }

@@ -43,4 +43,11 @@ public class TrashCounter : BaseCounter
 
         return false;
     }
+
+    public static new void ResetStaticData()
+    {
+        BaseCounter.ResetStaticData();
+
+        OnAnyObjectPlacedInTrashCounter = null;
+    }
 }

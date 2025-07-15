@@ -14,12 +14,15 @@ public class GameManager : MonoBehaviour
     }
 
     private GameState state;
+    private bool isGamePaused = false;
     private float waitingToStartTimer = 1f;
     private float countdownToStartTimer = 3f;
     private float gamePlayingTimer;
     private readonly float gamePlayingTimerMax = 10f;
 
     public event Action OnStateChanged;
+    public event Action OnGamePaused;
+    public event Action OnGameUnpaused;
 
     private void Awake()
     {
@@ -30,9 +33,15 @@ public class GameManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return;
         }
 
         state = GameState.WaitingToStart;
+    }
+
+    private void Start()
+    {
+        GameInput.Instance.OnPauseAction += GameInput_OnPauseAction;
     }
 
     private void Update()
@@ -109,6 +118,27 @@ public class GameManager : MonoBehaviour
         {
             state = GameState.GameOver;
             OnStateChanged?.Invoke();
+        }
+    }
+
+    private void GameInput_OnPauseAction()
+    {
+        TogglePauseGame();
+    }
+
+    public void TogglePauseGame()
+    {
+        isGamePaused = !isGamePaused;
+
+        if (isGamePaused)
+        {
+            Time.timeScale = 0f;
+            OnGamePaused?.Invoke();
+        }
+        else
+        {
+            Time.timeScale = 1f;
+            OnGameUnpaused?.Invoke();
         }
     }
 }

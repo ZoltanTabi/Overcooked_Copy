@@ -10,6 +10,8 @@ public class MainMenuUI : MonoBehaviour
     {
         playButton.onClick.AddListener(OnPlayButtonClicked);
         quitButton.onClick.AddListener(OnQuitButtonClicked);
+
+        Time.timeScale = 1f;
     }
 
     private void OnPlayButtonClicked()

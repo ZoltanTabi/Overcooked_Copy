@@ -67,4 +67,11 @@ public class CuttingCounter : BaseCounter, IHasProgress
     {
         OnProgressChanged?.Invoke((float)cuttingProgress / cuttingProgressMax);
     }
+
+    public static new void ResetStaticData()
+    {
+        BaseCounter.ResetStaticData();
+
+        OnAnyCut = null;
+    }
 }
