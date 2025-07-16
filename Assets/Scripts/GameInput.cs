@@ -1,10 +1,24 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputAction;
 
 public class GameInput : MonoBehaviour
 {
+    private const string PLAYER_PREFS_BINDING_KEY = "InputBindings";
+
+    public enum Binding
+    {
+        Move_Up,
+        Move_Down,
+        Move_Left,
+        Move_Right,
+        Interact,
+        InteractAlternate,
+        Pause
+    }
+
     public static GameInput Instance { get; private set; }
 
     private const float INTERACT_ALTERNATE_FIRE_TIME = 0.5f;
@@ -34,6 +48,11 @@ public class GameInput : MonoBehaviour
         }
 
         playerInputActions = new PlayerInputActions();
+
+        if (PlayerPrefs.HasKey(PLAYER_PREFS_BINDING_KEY))
+        {
+            playerInputActions.LoadBindingOverridesFromJson(PlayerPrefs.GetString(PLAYER_PREFS_BINDING_KEY));
+        }
 
         playerInputActions.Player.Enable();
 
@@ -116,5 +135,49 @@ public class GameInput : MonoBehaviour
     private void Pause_performed(CallbackContext context)
     {
         OnPauseAction?.Invoke();
+    }
+
+    public string GetBindingText(Binding binding)
+    {
+        return binding switch
+        {
+            Binding.Move_Up => playerInputActions.Player.Move.bindings[1].ToDisplayString(),
+            Binding.Move_Down => playerInputActions.Player.Move.bindings[2].ToDisplayString(),
+            Binding.Move_Left => playerInputActions.Player.Move.bindings[3].ToDisplayString(),
+            Binding.Move_Right => playerInputActions.Player.Move.bindings[4].ToDisplayString(),
+            Binding.Interact => playerInputActions.Player.Interact.bindings[0].ToDisplayString(),
+            Binding.InteractAlternate => playerInputActions.Player.InteractAlternate.bindings[0].ToDisplayString(),
+            Binding.Pause => playerInputActions.Player.Pause.bindings[0].ToDisplayString(),
+            _ => throw new ArgumentOutOfRangeException(nameof(binding), binding, null),
+        };
+    }
+
+    public void RebindBinding(Binding binding, Action onActionRebound)
+    {
+        playerInputActions.Player.Disable();
+
+        var (inputAction, bindingIndex) = binding switch
+        {
+            Binding.Move_Up => (playerInputActions.Player.Move, 1),
+            Binding.Move_Down => (playerInputActions.Player.Move, 2),
+            Binding.Move_Left => (playerInputActions.Player.Move, 3),
+            Binding.Move_Right => (playerInputActions.Player.Move, 4),
+            Binding.Interact => (playerInputActions.Player.Interact, 0),
+            Binding.InteractAlternate => (playerInputActions.Player.InteractAlternate, 0),
+            Binding.Pause => (playerInputActions.Player.Pause, 0),
+            _ => throw new ArgumentOutOfRangeException(nameof(binding), binding, null),
+        };
+
+        inputAction.PerformInteractiveRebinding(bindingIndex)
+            .OnComplete((callback) =>
+            {
+                callback.Dispose();
+                playerInputActions.Player.Enable();
+                onActionRebound();
+
+                PlayerPrefs.SetString(PLAYER_PREFS_BINDING_KEY, playerInputActions.SaveBindingOverridesAsJson());
+                PlayerPrefs.Save();
+            })
+            .Start();
     }
 }
