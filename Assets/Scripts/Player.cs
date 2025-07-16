@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 public class Player : MonoBehaviour, IKitchenObjectParent
@@ -75,6 +76,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
         float playerRadius = 0.7f;
         float playerHeight = 2f;
+        float controllerDriftingErrorMargin = .35f;
 
         Vector3[] directions = {
             moveDirection,
@@ -82,14 +84,17 @@ public class Player : MonoBehaviour, IKitchenObjectParent
             new Vector3(0, 0, moveDirection.z).normalized
         };
 
-        foreach (var direction in directions)
+        foreach (var (direction, i) in directions.Select((x, i) => (x, i)))
         {
             if (direction == Vector3.zero)
             {
                 continue;
             }
 
-            bool canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, direction, MoveDistance);
+            bool canMove = (i == 0
+                    || i == 1 && (moveDirection.x < -controllerDriftingErrorMargin || moveDirection.x > +controllerDriftingErrorMargin)
+                    || i == 2 && (moveDirection.z < -controllerDriftingErrorMargin || moveDirection.z > +controllerDriftingErrorMargin)
+                ) && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, direction, MoveDistance);
 
             if (canMove)
             {

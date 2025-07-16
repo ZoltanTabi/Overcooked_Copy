@@ -16,7 +16,10 @@ public class GameInput : MonoBehaviour
         Move_Right,
         Interact,
         InteractAlternate,
-        Pause
+        Pause,
+        Gamepad_Interact,
+        Gamepad_InteractAlternate,
+        Gamepad_Pause
     }
 
     public static GameInput Instance { get; private set; }
@@ -148,6 +151,9 @@ public class GameInput : MonoBehaviour
             Binding.Interact => playerInputActions.Player.Interact.bindings[0].ToDisplayString(),
             Binding.InteractAlternate => playerInputActions.Player.InteractAlternate.bindings[0].ToDisplayString(),
             Binding.Pause => playerInputActions.Player.Pause.bindings[0].ToDisplayString(),
+            Binding.Gamepad_Interact => playerInputActions.Player.Interact.bindings[1].ToDisplayString(),
+            Binding.Gamepad_InteractAlternate => playerInputActions.Player.InteractAlternate.bindings[1].ToDisplayString(),
+            Binding.Gamepad_Pause => playerInputActions.Player.Pause.bindings[1].ToDisplayString(),
             _ => throw new ArgumentOutOfRangeException(nameof(binding), binding, null),
         };
     }
@@ -165,6 +171,9 @@ public class GameInput : MonoBehaviour
             Binding.Interact => (playerInputActions.Player.Interact, 0),
             Binding.InteractAlternate => (playerInputActions.Player.InteractAlternate, 0),
             Binding.Pause => (playerInputActions.Player.Pause, 0),
+            Binding.Gamepad_Interact => (playerInputActions.Player.Interact, 1),
+            Binding.Gamepad_InteractAlternate => (playerInputActions.Player.InteractAlternate, 1),
+            Binding.Gamepad_Pause => (playerInputActions.Player.Pause, 1),
             _ => throw new ArgumentOutOfRangeException(nameof(binding), binding, null),
         };
 
