@@ -20,6 +20,7 @@ public class OptionsUI : MonoBehaviour
     [SerializeField] private Button moveRightButton;
     [SerializeField] private Button interactButton;
     [SerializeField] private Button interactAlternateButton;
+    [SerializeField] private Button dashButton;
     [SerializeField] private Button pauseButton;
     [SerializeField] private TextMeshProUGUI moveUpText;
     [SerializeField] private TextMeshProUGUI moveDownText;
@@ -27,14 +28,17 @@ public class OptionsUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI moveRightText;
     [SerializeField] private TextMeshProUGUI interactText;
     [SerializeField] private TextMeshProUGUI interactAlternateText;
+    [SerializeField] private TextMeshProUGUI dashText;
     [SerializeField] private TextMeshProUGUI pauseText;
 
     [Header("Controller Control Options")]
     [SerializeField] private Button gamepadInteractButton;
     [SerializeField] private Button gamepadInteractAlternateButton;
+    [SerializeField] private Button gamepadDashButton;
     [SerializeField] private Button gamepadPauseButton;
     [SerializeField] private TextMeshProUGUI gamepadInteractText;
     [SerializeField] private TextMeshProUGUI gamepadInteractAlternateText;
+    [SerializeField] private TextMeshProUGUI gamepadDashText;
     [SerializeField] private TextMeshProUGUI gamepadPauseText;
 
     [Header("Waiting Windows")]
@@ -82,10 +86,12 @@ public class OptionsUI : MonoBehaviour
 
         interactButton.onClick.AddListener(() => RebindBinding(GameInput.Binding.Interact));
         interactAlternateButton.onClick.AddListener(() => RebindBinding(GameInput.Binding.InteractAlternate));
+        dashButton.onClick.AddListener(() => RebindBinding(GameInput.Binding.Dash));
         pauseButton.onClick.AddListener(() => RebindBinding(GameInput.Binding.Pause));
 
         gamepadInteractButton.onClick.AddListener(() => RebindBinding(GameInput.Binding.Gamepad_Interact));
         gamepadInteractAlternateButton.onClick.AddListener(() => RebindBinding(GameInput.Binding.Gamepad_InteractAlternate));
+        gamepadDashButton.onClick.AddListener(() => RebindBinding(GameInput.Binding.Gamepad_Dash));
         gamepadPauseButton.onClick.AddListener(() => RebindBinding(GameInput.Binding.Gamepad_Pause));
     }
 
@@ -114,10 +120,12 @@ public class OptionsUI : MonoBehaviour
 
         interactText.text = GameInput.Instance.GetBindingText(GameInput.Binding.Interact);
         interactAlternateText.text = GameInput.Instance.GetBindingText(GameInput.Binding.InteractAlternate);
+        dashText.text = GameInput.Instance.GetBindingText(GameInput.Binding.Dash);
         pauseText.text = GameInput.Instance.GetBindingText(GameInput.Binding.Pause);
 
         gamepadInteractText.text = GameInput.Instance.GetBindingText(GameInput.Binding.Gamepad_Interact);
         gamepadInteractAlternateText.text = GameInput.Instance.GetBindingText(GameInput.Binding.Gamepad_InteractAlternate);
+        gamepadDashText.text = GameInput.Instance.GetBindingText(GameInput.Binding.Gamepad_Dash);
         gamepadPauseText.text = GameInput.Instance.GetBindingText(GameInput.Binding.Gamepad_Pause);
     }
 

@@ -10,6 +10,8 @@ public class GameInput : MonoBehaviour
     private const string PLAYER_PREFS_BINDING_KEY = "InputBindings";
     private const string ESCAPE_KEY = "Escape";
     private const string ESCAPE_KEY_DISPLAY_NAME = "esc";
+    private const string LEFT_SHIFT_KEY = "Left Shift";
+    private const string LEFT_SHIFT_KEY_DISPLAY_NAME = "Shift";
 
     public enum Binding
     {
@@ -19,9 +21,11 @@ public class GameInput : MonoBehaviour
         Move_Right,
         Interact,
         InteractAlternate,
+        Dash,
         Pause,
         Gamepad_Interact,
         Gamepad_InteractAlternate,
+        Gamepad_Dash,
         Gamepad_Pause
     }
 
@@ -82,6 +86,7 @@ public class GameInput : MonoBehaviour
         playerInputActions.Player.Interact.performed -= Interact_performed;
         playerInputActions.Player.InteractAlternate.performed -= InteractAlternate_performed;
         playerInputActions.Player.InteractAlternate.canceled -= InteractAlternate_canceled;
+        playerInputActions.Player.Dash.performed -= Dash_performed;
         playerInputActions.Player.Pause.performed -= Pause_performed;
 
         playerInputActions.Player.Disable();
@@ -160,9 +165,11 @@ public class GameInput : MonoBehaviour
             Binding.Move_Right => playerInputActions.Player.Move.bindings[4].ToDisplayString(),
             Binding.Interact => playerInputActions.Player.Interact.bindings[0].ToDisplayString(),
             Binding.InteractAlternate => playerInputActions.Player.InteractAlternate.bindings[0].ToDisplayString(),
+            Binding.Dash => playerInputActions.Player.Dash.bindings[0].ToDisplayString(),
             Binding.Pause => playerInputActions.Player.Pause.bindings[0].ToDisplayString(),
             Binding.Gamepad_Interact => playerInputActions.Player.Interact.bindings[1].ToDisplayString(),
             Binding.Gamepad_InteractAlternate => playerInputActions.Player.InteractAlternate.bindings[1].ToDisplayString(),
+            Binding.Gamepad_Dash => playerInputActions.Player.Dash.bindings[1].ToDisplayString(),
             Binding.Gamepad_Pause => playerInputActions.Player.Pause.bindings[1].ToDisplayString(),
             _ => throw new ArgumentOutOfRangeException(nameof(binding), binding, null),
         };
@@ -170,6 +177,11 @@ public class GameInput : MonoBehaviour
         if (displayName.Equals(ESCAPE_KEY, StringComparison.OrdinalIgnoreCase))
         {
             displayName = ESCAPE_KEY_DISPLAY_NAME;
+        }
+
+        if (displayName.Equals(LEFT_SHIFT_KEY, StringComparison.OrdinalIgnoreCase))
+        {
+            displayName = LEFT_SHIFT_KEY_DISPLAY_NAME;
         }
 
         return displayName;
@@ -187,9 +199,11 @@ public class GameInput : MonoBehaviour
             Binding.Move_Right => (playerInputActions.Player.Move, 4),
             Binding.Interact => (playerInputActions.Player.Interact, 0),
             Binding.InteractAlternate => (playerInputActions.Player.InteractAlternate, 0),
+            Binding.Dash => (playerInputActions.Player.Dash, 0),
             Binding.Pause => (playerInputActions.Player.Pause, 0),
             Binding.Gamepad_Interact => (playerInputActions.Player.Interact, 1),
             Binding.Gamepad_InteractAlternate => (playerInputActions.Player.InteractAlternate, 1),
+            Binding.Gamepad_Dash => (playerInputActions.Player.Dash, 1),
             Binding.Gamepad_Pause => (playerInputActions.Player.Pause, 1),
             _ => throw new ArgumentOutOfRangeException(nameof(binding), binding, null),
         };
