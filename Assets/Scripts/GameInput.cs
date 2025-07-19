@@ -6,6 +6,7 @@ using static UnityEngine.InputSystem.InputAction;
 
 public class GameInput : MonoBehaviour
 {
+    private const float INTERACT_ALTERNATE_FIRE_TIME = 0.3f;
     private const string PLAYER_PREFS_BINDING_KEY = "InputBindings";
     private const string ESCAPE_KEY = "Escape";
     private const string ESCAPE_KEY_DISPLAY_NAME = "esc";
@@ -25,8 +26,6 @@ public class GameInput : MonoBehaviour
     }
 
     public static GameInput Instance { get; private set; }
-
-    private const float INTERACT_ALTERNATE_FIRE_TIME = 0.5f;
 
     private PlayerInputActions playerInputActions;
 
