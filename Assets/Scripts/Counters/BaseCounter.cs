@@ -9,21 +9,21 @@ public class BaseCounter : MonoBehaviour, IKitchenObjectParent
 
     public static event Action<BaseCounter> OnAnyObjectPlacedOnCounter;
 
-    public virtual bool Interact(Player player)
+    public virtual bool Interact(IKitchenObjectParent parent)
     {
-        if (!HasKitchenObject() && player.HasKitchenObject())
+        if (!HasKitchenObject() && parent.HasKitchenObject())
         {
-            player.GetKitchenObject().SetKitchenObjectParent(this);
+            parent.GetKitchenObject().SetKitchenObjectParent(this);
 
             return true;
         }
-        else if (HasKitchenObject() && !player.HasKitchenObject())
+        else if (HasKitchenObject() && !parent.HasKitchenObject())
         {
-            GetKitchenObject().SetKitchenObjectParent(player);
+            GetKitchenObject().SetKitchenObjectParent(parent);
 
             return true;
         }
-        else if (HasKitchenObject() && player.HasKitchenObject() && player.GetKitchenObject().TryGetPlate(out var plateKitchenObject))
+        else if (HasKitchenObject() && parent.HasKitchenObject() && parent.GetKitchenObject().TryGetPlate(out var plateKitchenObject))
         {
             if (plateKitchenObject.TryAddIngredient(GetKitchenObject().GetKitchenObjectSO()))
             {
@@ -32,11 +32,11 @@ public class BaseCounter : MonoBehaviour, IKitchenObjectParent
                 return true;
             }
         }
-        else if (HasKitchenObject() && player.HasKitchenObject() && GetKitchenObject().TryGetPlate(out plateKitchenObject))
+        else if (HasKitchenObject() && parent.HasKitchenObject() && GetKitchenObject().TryGetPlate(out plateKitchenObject))
         {
-            if (plateKitchenObject.TryAddIngredient(player.GetKitchenObject().GetKitchenObjectSO()))
+            if (plateKitchenObject.TryAddIngredient(parent.GetKitchenObject().GetKitchenObjectSO()))
             {
-                player.GetKitchenObject().DestroySelf();
+                parent.GetKitchenObject().DestroySelf();
 
                 return true;
             }
@@ -44,12 +44,12 @@ public class BaseCounter : MonoBehaviour, IKitchenObjectParent
 
         return false;
     }
-
-    public virtual bool InteractAlternate(Player player)
+    
+    public virtual bool InteractAlternate(IKitchenObjectParent parent)
     {
         return false;
     }
-
+    
     public Transform GetKitchenObjectFollowTransform()
     {
         return counterTopPoint;

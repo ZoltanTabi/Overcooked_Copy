@@ -94,12 +94,12 @@ public class StoveCounter : BaseCounter, IHasProgress
         }
     }
 
-    public override bool Interact(Player player)
+    public override bool Interact(IKitchenObjectParent parent)
     {
-        if (!HasKitchenObject() && player.HasKitchenObject() && TryGetFryingRecipeForInput(player.GetKitchenObject().GetKitchenObjectSO(), out var fryingRecipeSO))
+        if (!HasKitchenObject() && parent.HasKitchenObject() && TryGetFryingRecipeForInput(parent.GetKitchenObject().GetKitchenObjectSO(), out var fryingRecipeSO))
         {
             this.fryingRecipeSO = fryingRecipeSO;
-            player.GetKitchenObject().SetKitchenObjectParent(this);
+            parent.GetKitchenObject().SetKitchenObjectParent(this);
 
             fryingTimer = 0f;
             SetState(StoveCounterState.Frying);
@@ -107,16 +107,16 @@ public class StoveCounter : BaseCounter, IHasProgress
 
             return true;
         }
-        else if (HasKitchenObject() && !player.HasKitchenObject())
+        else if (HasKitchenObject() && !parent.HasKitchenObject())
         {
-            GetKitchenObject().SetKitchenObjectParent(player);
+            GetKitchenObject().SetKitchenObjectParent(parent);
 
             SetState(StoveCounterState.Idle);
             OnProgressChanged?.Invoke(0f);
 
             return true;
         }
-        else if (HasKitchenObject() && player.HasKitchenObject() && player.GetKitchenObject().TryGetPlate(out var plateKitchenObjectOfPlayer))
+        else if (HasKitchenObject() && parent.HasKitchenObject() && parent.GetKitchenObject().TryGetPlate(out var plateKitchenObjectOfPlayer))
         {
             if (plateKitchenObjectOfPlayer.TryAddIngredient(GetKitchenObject().GetKitchenObjectSO()))
             {

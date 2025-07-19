@@ -37,13 +37,13 @@ public class PlatesCounter : BaseCounter
         }
     }
 
-    public override bool Interact(Player player)
+    public override bool Interact(IKitchenObjectParent parent)
     {
-        if (!player.HasKitchenObject() && platesSpawnedAmount > 0)
+        if (!parent.HasKitchenObject() && platesSpawnedAmount > 0)
         {
             --platesSpawnedAmount;
 
-            KitchenObject.SpawnKitchenObject(plateKitchenObjectSO, player);
+            KitchenObject.SpawnKitchenObject(plateKitchenObjectSO, parent);
             OnPlateRemoved?.Invoke();
 
             return true;

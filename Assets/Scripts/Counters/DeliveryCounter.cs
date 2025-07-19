@@ -39,9 +39,9 @@ public class DeliveryCounter : BaseCounter
         }
     }
 
-    public override bool Interact(Player player)
+    public override bool Interact(IKitchenObjectParent parent)
     {
-        if (player.HasKitchenObject() && player.GetKitchenObject().TryGetPlate(out var _))
+        if (parent.HasKitchenObject() && parent.GetKitchenObject().TryGetPlate(out var _))
         {
             if (HasKitchenObject())
             {
@@ -50,7 +50,7 @@ public class DeliveryCounter : BaseCounter
                 GetKitchenObject().DestroySelf();
             }
 
-            player.GetKitchenObject().SetKitchenObjectParent(this);
+            parent.GetKitchenObject().SetKitchenObjectParent(this);
 
             return true;
         }

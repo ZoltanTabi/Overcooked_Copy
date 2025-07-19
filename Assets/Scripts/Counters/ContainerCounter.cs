@@ -7,14 +7,14 @@ public class ContainerCounter : BaseCounter, IKitchenObjectParent
 
     public event Action OnPlayerGrabbedObject;
 
-    public override bool Interact(Player player)
+    public override bool Interact(IKitchenObjectParent parent)
     {
-        if (base.Interact(player))
+        if (base.Interact(parent))
         {
             return true;
         }
 
-        KitchenObject.SpawnKitchenObject(kitchenObjectSO, player);
+        KitchenObject.SpawnKitchenObject(kitchenObjectSO, parent);
 
         OnPlayerGrabbedObject?.Invoke();
 

@@ -13,19 +13,19 @@ public class CuttingCounter : BaseCounter, IHasProgress
     public event Action<float> OnProgressChanged;
     public event Action OnCut;
 
-    public override bool Interact(Player player)
+    public override bool Interact(IKitchenObjectParent parent)
     {
-        if (!HasKitchenObject() && player.HasKitchenObject() && TryGetCuttingRecipeForInput(player.GetKitchenObject().GetKitchenObjectSO(), out var cuttingRecipeSO))
+        if (!HasKitchenObject() && parent.HasKitchenObject() && TryGetCuttingRecipeForInput(parent.GetKitchenObject().GetKitchenObjectSO(), out var cuttingRecipeSO))
         {
             cuttingProgress = 0;
 
             InvokeProgressChanged(cuttingRecipeSO.cuttingProgressMax);
         }
 
-        return base.Interact(player);
+        return base.Interact(parent);
     }
 
-    public override bool InteractAlternate(Player player)
+    public override bool InteractAlternate(IKitchenObjectParent parent)
     {
         if (HasKitchenObject() && TryGetCuttingRecipeForInput(GetKitchenObject().GetKitchenObjectSO(), out var cuttingRecipeSO))
         {

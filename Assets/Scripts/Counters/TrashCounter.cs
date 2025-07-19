@@ -24,9 +24,9 @@ public class TrashCounter : BaseCounter
         }
     }
 
-    public override bool Interact(Player player)
+    public override bool Interact(IKitchenObjectParent parent)
     {
-        if (player.HasKitchenObject())
+        if (parent.HasKitchenObject())
         {
             if (HasKitchenObject())
             {
@@ -35,7 +35,7 @@ public class TrashCounter : BaseCounter
 
             fallSpeed = 0f;
 
-            player.GetKitchenObject().SetKitchenObjectParent(this);
+            parent.GetKitchenObject().SetKitchenObjectParent(this);
             OnAnyObjectPlacedInTrashCounter?.Invoke(this);
 
             return true;
