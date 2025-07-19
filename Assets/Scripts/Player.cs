@@ -1,18 +1,29 @@
 using System;
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 
 public class Player : MonoBehaviour, IKitchenObjectParent
 {
+    private const float PLAYER_RADIUS = 0.7f;
+    private const float PLAYER_HEIGHT = 2f;
+    private const float CONTROLLER_DRIFTING_ERROR_MARGIN = 0.35f;
+    private const float DASH_COOLDOWN_TIME = .6f;
+
     public static Player Instance { get; private set; }
 
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float rotateSpeed = 10f;
+    [SerializeField] private float dashMultiplier = 3f;
     [SerializeField] private GameInput gameInput;
     [SerializeField] private LayerMask counterLayerMask;
     [SerializeField] private Transform kitchenObjectHoldPoint;
 
     private bool isWalking = false;
+    private bool isDashing = false;
+    private bool isDashCooldown = false;
+    public float dashDurationTimer = 0f;
+    public float dashDurationTimerMax = 0.2f;
     private Vector3 lastInteractDirection = Vector3.zero;
     private BaseCounter selectedCounter;
     private KitchenObject kitchenObject;
@@ -38,10 +49,28 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     {
         gameInput.OnInteractAction += GameInput_OnInteractAction;
         gameInput.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
+        gameInput.OnDashAction += GameInput_OnDashAction;
     }
 
     private void Update()
     {
+        if (isDashing)
+        {
+            dashDurationTimer += Time.deltaTime;
+
+            if (dashDurationTimer >= dashDurationTimerMax)
+            {
+                isDashing = false;
+                dashDurationTimer = 0f;
+            }
+            else
+            {
+                Dash();
+
+                return;
+            }
+        }
+
         Vector3 moveDirection = GetMoveDirection();
 
         if (moveDirection != Vector3.zero)
@@ -74,10 +103,6 @@ public class Player : MonoBehaviour, IKitchenObjectParent
             lastInteractDirection = moveDirection.normalized;
         }
 
-        float playerRadius = 0.7f;
-        float playerHeight = 2f;
-        float controllerDriftingErrorMargin = .35f;
-
         Vector3[] directions = {
             moveDirection,
             new Vector3(moveDirection.x, 0, 0).normalized,
@@ -92,9 +117,9 @@ public class Player : MonoBehaviour, IKitchenObjectParent
             }
 
             bool canMove = (i == 0
-                    || i == 1 && (moveDirection.x < -controllerDriftingErrorMargin || moveDirection.x > +controllerDriftingErrorMargin)
-                    || i == 2 && (moveDirection.z < -controllerDriftingErrorMargin || moveDirection.z > +controllerDriftingErrorMargin)
-                ) && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, direction, MoveDistance);
+                    || i == 1 && (moveDirection.x < -CONTROLLER_DRIFTING_ERROR_MARGIN || moveDirection.x > +CONTROLLER_DRIFTING_ERROR_MARGIN)
+                    || i == 2 && (moveDirection.z < -CONTROLLER_DRIFTING_ERROR_MARGIN || moveDirection.z > +CONTROLLER_DRIFTING_ERROR_MARGIN)
+                ) && CanMoveThatDirection(direction, MoveDistance);
 
             if (canMove)
             {
@@ -110,6 +135,30 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         transform.position += MoveDistance * moveDirection;
     }
 
+    private void Dash()
+    {
+        if (lastInteractDirection == Vector3.zero)
+        {
+            return;
+        }
+
+        if (CanMoveThatDirection(lastInteractDirection, MoveDistance * dashMultiplier))
+        {
+            Move(lastInteractDirection * dashMultiplier);
+
+            return;
+        }
+
+        if (CanMoveThatDirection(lastInteractDirection, MoveDistance))
+        {
+            Move(lastInteractDirection);
+
+            return;
+        }
+
+        isDashing = false;
+    }
+
     private void Rotate()
     {
         if (lastInteractDirection == Vector3.zero)
@@ -118,6 +167,11 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         }
 
         transform.forward = Vector3.Slerp(transform.forward, lastInteractDirection, rotateSpeed * Time.deltaTime);
+    }
+
+    private bool CanMoveThatDirection(Vector3 direction, float maxDistance)
+    {
+        return !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * PLAYER_HEIGHT, PLAYER_RADIUS, direction, maxDistance);
     }
 
     private void HandleAvailableInteractions()
@@ -177,6 +231,24 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         {
             selectedCounter.InteractAlternate(this);
         }
+    }
+
+    private void GameInput_OnDashAction()
+    {
+        if (lastInteractDirection == Vector3.zero || isDashCooldown)
+        {
+            return;
+        }
+
+        isDashing = true;
+        StartCoroutine(DashCooldownRoutine());
+    }
+
+    private IEnumerator DashCooldownRoutine()
+    {
+        isDashCooldown = true;
+        yield return new WaitForSeconds(DASH_COOLDOWN_TIME);
+        isDashCooldown = false;
     }
 
     public Transform GetKitchenObjectFollowTransform()

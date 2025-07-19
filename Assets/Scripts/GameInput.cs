@@ -37,6 +37,7 @@ public class GameInput : MonoBehaviour
 
     public event Action OnInteractAction;
     public event Action OnInteractAlternateAction;
+    public event Action OnDashAction;
     public event Action OnPauseAction;
     public event Action OnBindingRebind;
 
@@ -68,6 +69,8 @@ public class GameInput : MonoBehaviour
 
         playerInputActions.Player.InteractAlternate.performed += InteractAlternate_performed;
         playerInputActions.Player.InteractAlternate.canceled += InteractAlternate_canceled;
+
+        playerInputActions.Player.Dash.performed += Dash_performed;
 
         playerInputActions.Player.Pause.performed += Pause_performed;
     }
@@ -135,6 +138,11 @@ public class GameInput : MonoBehaviour
             OnInteractAlternateAction?.Invoke();
             yield return new WaitForSeconds(INTERACT_ALTERNATE_FIRE_TIME);
         }
+    }
+
+    private void Dash_performed(CallbackContext context)
+    {
+        OnDashAction?.Invoke();
     }
 
     private void Pause_performed(CallbackContext context)
