@@ -15,10 +15,9 @@ public class GameManager : MonoBehaviour
 
     private GameState state;
     private bool isGamePaused = false;
-    private float waitingToStartTimer = 1f;
     private float countdownToStartTimer = 3f;
     private float gamePlayingTimer;
-    private readonly float gamePlayingTimerMax = 10f;
+    private readonly float gamePlayingTimerMax = 20f;
 
     public event Action OnStateChanged;
     public event Action OnGamePaused;
@@ -41,6 +40,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
         GameInput.Instance.OnPauseAction += GameInput_OnPauseAction;
     }
 
@@ -48,9 +48,6 @@ public class GameManager : MonoBehaviour
     {
         switch (state)
         {
-            case GameState.WaitingToStart:
-                HandleWaitingToStartState();
-                break;
             case GameState.CountdownToStart:
                 HandleCountdownToStartState();
                 break;
@@ -62,11 +59,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public bool IsGamePlaying()
-    {
-        return state == GameState.GamePlaying;
-    }
-
     public bool IsCountdownToStartActive()
     {
         return state == GameState.CountdownToStart;
@@ -75,6 +67,11 @@ public class GameManager : MonoBehaviour
     public float GetCountdownToStartTimer()
     {
         return countdownToStartTimer;
+    }
+
+    public bool IsGamePlaying()
+    {
+        return state == GameState.GamePlaying;
     }
 
     public bool IsGameOverActive()
@@ -89,9 +86,7 @@ public class GameManager : MonoBehaviour
 
     private void HandleWaitingToStartState()
     {
-        waitingToStartTimer -= Time.deltaTime;
-
-        if (waitingToStartTimer <= 0f)
+        if (state == GameState.WaitingToStart)
         {
             state = GameState.CountdownToStart;
             OnStateChanged?.Invoke();
@@ -119,6 +114,11 @@ public class GameManager : MonoBehaviour
             state = GameState.GameOver;
             OnStateChanged?.Invoke();
         }
+    }
+
+    private void GameInput_OnInteractAction()
+    {
+        HandleWaitingToStartState();
     }
 
     private void GameInput_OnPauseAction()

@@ -7,6 +7,8 @@ using static UnityEngine.InputSystem.InputAction;
 public class GameInput : MonoBehaviour
 {
     private const string PLAYER_PREFS_BINDING_KEY = "InputBindings";
+    private const string ESCAPE_KEY = "Escape";
+    private const string ESCAPE_KEY_DISPLAY_NAME = "esc";
 
     public enum Binding
     {
@@ -37,6 +39,7 @@ public class GameInput : MonoBehaviour
     public event Action OnInteractAction;
     public event Action OnInteractAlternateAction;
     public event Action OnPauseAction;
+    public event Action OnBindingRebind;
 
     private void Awake()
     {
@@ -142,7 +145,7 @@ public class GameInput : MonoBehaviour
 
     public string GetBindingText(Binding binding)
     {
-        return binding switch
+        var displayName = binding switch
         {
             Binding.Move_Up => playerInputActions.Player.Move.bindings[1].ToDisplayString(),
             Binding.Move_Down => playerInputActions.Player.Move.bindings[2].ToDisplayString(),
@@ -156,6 +159,13 @@ public class GameInput : MonoBehaviour
             Binding.Gamepad_Pause => playerInputActions.Player.Pause.bindings[1].ToDisplayString(),
             _ => throw new ArgumentOutOfRangeException(nameof(binding), binding, null),
         };
+
+        if (displayName.Equals(ESCAPE_KEY, StringComparison.OrdinalIgnoreCase))
+        {
+            displayName = ESCAPE_KEY_DISPLAY_NAME;
+        }
+
+        return displayName;
     }
 
     public void RebindBinding(Binding binding, Action onActionRebound)
@@ -186,6 +196,8 @@ public class GameInput : MonoBehaviour
 
                 PlayerPrefs.SetString(PLAYER_PREFS_BINDING_KEY, playerInputActions.SaveBindingOverridesAsJson());
                 PlayerPrefs.Save();
+
+                OnBindingRebind?.Invoke();
             })
             .Start();
     }
