@@ -356,6 +356,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   kitchenObjectHoldPoint: {fileID: 182895126}
+  throwableObjectContainerPrefab: {fileID: 8242434332887951438, guid: 0908384bb4ac1f348961c53fda2910b5, type: 3}
   dashDurationTimer: 0
   dashDurationTimerMax: 0.2
 --- !u!114 &58392202

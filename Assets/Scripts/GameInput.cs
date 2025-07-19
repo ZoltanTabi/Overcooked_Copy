@@ -22,10 +22,12 @@ public class GameInput : MonoBehaviour
         Interact,
         InteractAlternate,
         Dash,
+        Throw,
         Pause,
         Gamepad_Interact,
         Gamepad_InteractAlternate,
         Gamepad_Dash,
+        Gamepad_Throw,
         Gamepad_Pause
     }
 
@@ -42,6 +44,7 @@ public class GameInput : MonoBehaviour
     public event Action OnInteractAction;
     public event Action OnInteractAlternateAction;
     public event Action OnDashAction;
+    public event Action OnThrowAction;
     public event Action OnPauseAction;
     public event Action OnBindingRebind;
 
@@ -76,6 +79,8 @@ public class GameInput : MonoBehaviour
 
         playerInputActions.Player.Dash.performed += Dash_performed;
 
+        playerInputActions.Player.Throw.performed += Throw_performed;
+
         playerInputActions.Player.Pause.performed += Pause_performed;
     }
 
@@ -87,6 +92,7 @@ public class GameInput : MonoBehaviour
         playerInputActions.Player.InteractAlternate.performed -= InteractAlternate_performed;
         playerInputActions.Player.InteractAlternate.canceled -= InteractAlternate_canceled;
         playerInputActions.Player.Dash.performed -= Dash_performed;
+        playerInputActions.Player.Throw.performed -= Throw_performed;
         playerInputActions.Player.Pause.performed -= Pause_performed;
 
         playerInputActions.Player.Disable();
@@ -150,6 +156,11 @@ public class GameInput : MonoBehaviour
         OnDashAction?.Invoke();
     }
 
+    private void Throw_performed(CallbackContext context)
+    {
+        OnThrowAction?.Invoke();
+    }
+
     private void Pause_performed(CallbackContext context)
     {
         OnPauseAction?.Invoke();
@@ -166,10 +177,12 @@ public class GameInput : MonoBehaviour
             Binding.Interact => playerInputActions.Player.Interact.bindings[0].ToDisplayString(),
             Binding.InteractAlternate => playerInputActions.Player.InteractAlternate.bindings[0].ToDisplayString(),
             Binding.Dash => playerInputActions.Player.Dash.bindings[0].ToDisplayString(),
+            Binding.Throw => playerInputActions.Player.Throw.bindings[0].ToDisplayString(),
             Binding.Pause => playerInputActions.Player.Pause.bindings[0].ToDisplayString(),
             Binding.Gamepad_Interact => playerInputActions.Player.Interact.bindings[1].ToDisplayString(),
             Binding.Gamepad_InteractAlternate => playerInputActions.Player.InteractAlternate.bindings[1].ToDisplayString(),
             Binding.Gamepad_Dash => playerInputActions.Player.Dash.bindings[1].ToDisplayString(),
+            Binding.Gamepad_Throw => playerInputActions.Player.Throw.bindings[1].ToDisplayString(),
             Binding.Gamepad_Pause => playerInputActions.Player.Pause.bindings[1].ToDisplayString(),
             _ => throw new ArgumentOutOfRangeException(nameof(binding), binding, null),
         };
@@ -200,10 +213,12 @@ public class GameInput : MonoBehaviour
             Binding.Interact => (playerInputActions.Player.Interact, 0),
             Binding.InteractAlternate => (playerInputActions.Player.InteractAlternate, 0),
             Binding.Dash => (playerInputActions.Player.Dash, 0),
+            Binding.Throw => (playerInputActions.Player.Throw, 0),
             Binding.Pause => (playerInputActions.Player.Pause, 0),
             Binding.Gamepad_Interact => (playerInputActions.Player.Interact, 1),
             Binding.Gamepad_InteractAlternate => (playerInputActions.Player.InteractAlternate, 1),
             Binding.Gamepad_Dash => (playerInputActions.Player.Dash, 1),
+            Binding.Gamepad_Throw => (playerInputActions.Player.Throw, 1),
             Binding.Gamepad_Pause => (playerInputActions.Player.Pause, 1),
             _ => throw new ArgumentOutOfRangeException(nameof(binding), binding, null),
         };

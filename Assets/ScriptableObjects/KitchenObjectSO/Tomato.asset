@@ -15,3 +15,4 @@ MonoBehaviour:
   prefab: {fileID: 5763423202536042369, guid: 00fd7f7632ac22944aab4baeb6355406, type: 3}
   sprite: {fileID: 21300000, guid: 91e8fe3de9249fc44b7bdd8050062896, type: 3}
   objectName: Tomato
+  throwable: 1

@@ -18,6 +18,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     [SerializeField] private GameInput gameInput;
     [SerializeField] private LayerMask counterLayerMask;
     [SerializeField] private Transform kitchenObjectHoldPoint;
+    [SerializeField] private Transform throwableObjectContainerPrefab;
 
     private bool isWalking = false;
     private bool isDashing = false;
@@ -50,6 +51,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         gameInput.OnInteractAction += GameInput_OnInteractAction;
         gameInput.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
         gameInput.OnDashAction += GameInput_OnDashAction;
+        gameInput.OnThrowAction += GameInput_OnThrowAction;
     }
 
     private void Update()
@@ -242,6 +244,14 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
         isDashing = true;
         StartCoroutine(DashCooldownRoutine());
+    }
+
+    private void GameInput_OnThrowAction()
+    {
+        Transform throwableObjectContainerTransform = Instantiate(throwableObjectContainerPrefab);
+
+        ThrowableObjectContainer throwableObjectContainer = throwableObjectContainerTransform.GetComponent<ThrowableObjectContainer>();
+        throwableObjectContainer.Throw(this, lastInteractDirection);
     }
 
     private IEnumerator DashCooldownRoutine()
