@@ -26,10 +26,18 @@ public class SoundManager : MonoBehaviour
 
     private void Start()
     {
-        DeliveryManager.Instance.OnRecipeSuccess += DeliveryManager_OnRecipeSuccess;
-        DeliveryManager.Instance.OnRecipeFailed += DeliveryManager_OnRecipeFailed;
+        if (DeliveryManager.Instance != null)
+        {
+            DeliveryManager.Instance.OnRecipeSuccess += DeliveryManager_OnRecipeSuccess;
+            DeliveryManager.Instance.OnRecipeFailed += DeliveryManager_OnRecipeFailed;
+        }
+
+        if (Player.Instance != null)
+        {
+            Player.Instance.OnPickSomething += Player_OnPickSomething;
+        }
+
         CuttingCounter.OnAnyCut += CuttingCounter_OnAnyCut;
-        Player.Instance.OnPickSomething += Player_OnPickSomething;
         BaseCounter.OnAnyObjectPlacedOnCounter += BaseCounter_OnAnyObjectPlacedOnCounter;
         TrashCounter.OnAnyObjectPlacedInTrashCounter += TrashCounter_OnAnyObjectPlacedInTrashCounter;
     }
@@ -81,12 +89,24 @@ public class SoundManager : MonoBehaviour
 
     public void PlayCountdownSound()
     {
-        PlaySound(audioClipsRefSO.warning, Vector3.zero);
+        PlaySound(audioClipsRefSO.warning, Camera.main.transform.position);
     }
 
     public void PlayWarningSound(Vector3 postion)
     {
         PlaySound(audioClipsRefSO.warning, postion);
+    }
+
+    public void PlayButtonClickSound()
+    {
+        Debug.Log("Button clicked sound played.");
+        PlaySound(audioClipsRefSO.buttonClick, Camera.main.transform.position);
+    }
+
+    public void PlayButtonSelectSound()
+    {
+        Debug.Log("Button selected sound played.");
+        PlaySound(audioClipsRefSO.buttonSelect, Camera.main.transform.position);
     }
 
     public void ChangeVolume()
