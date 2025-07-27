@@ -19,7 +19,8 @@ public class PlayerIdleState : BaseState<PlayerStateMachine>
         if (Input.GetKeyDown(KeyCode.H))
         {
             Debug.Log($"Player {stateMachine.Player.name} pressed H key to start the state machine");
-            stateMachine.Start();
+
+            stateMachine.IsStarted = true;
         }
 
         if (stateMachine.IsStarted && stateMachine.CurrentRecipe != null)

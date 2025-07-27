@@ -32,7 +32,7 @@ public class PlayerRecipePlanState : BaseState<PlayerStateMachine>
             return;
         }
 
-        if (stateMachine.IngredientIsReadyOnStove)
+        if (stateMachine.StoveCounter != null && stateMachine.StoveCounter.IsFried())
         {
             stateMachine.ChangeState(PlayerGetFromStoveState.Create(stateMachine));
 
@@ -72,7 +72,7 @@ public class PlayerRecipePlanState : BaseState<PlayerStateMachine>
 
     public override void Update()
     {
-        if (stateMachine.IngredientIsReadyOnStove)
+        if (stateMachine.StoveCounter != null && stateMachine.StoveCounter.IsFried())
         {
             stateMachine.ChangeState(PlayerGetFromStoveState.Create(stateMachine));
         }

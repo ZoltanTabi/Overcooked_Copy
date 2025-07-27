@@ -18,7 +18,7 @@ public class PlayerMovingState : BaseState<PlayerStateMachine>
 
         stateMachine.Player.OnCounterSelected += Player_OnCounterSelected;
 
-        moveDirection = stateMachine.GetMoveDirection(targetCounter);
+        moveDirection = GetMoveDirection();
 
         Player_OnCounterSelected(stateMachine.Player.GetSelectedCounter());
     }
@@ -27,7 +27,7 @@ public class PlayerMovingState : BaseState<PlayerStateMachine>
     {
         if (moveDirection != Vector2.zero)
         {
-            moveDirection = stateMachine.GetMoveDirection(targetCounter);
+            moveDirection = GetMoveDirection();
         }
 
         GameInput.Instance.Move(moveDirection);
@@ -47,5 +47,17 @@ public class PlayerMovingState : BaseState<PlayerStateMachine>
             moveDirection = Vector2.zero;
             stateMachine.ChangeState(nextState);
         }
+    }
+
+    public Vector2 GetMoveDirection()
+    {
+        if (targetCounter == null)
+        {
+            return Vector2.zero;
+        }
+
+        Vector3 dir3D = targetCounter.transform.position - stateMachine.Player.transform.position;
+
+        return new Vector2(dir3D.x, dir3D.z).normalized;
     }
 }
