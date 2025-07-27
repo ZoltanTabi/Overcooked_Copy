@@ -2,88 +2,56 @@ using UnityEngine;
 
 public class PlayerCuttingState : BaseState<PlayerStateMachine>
 {
-    private readonly CuttingRecipeSO cuttingRecipeSO;
+    private CuttingCounter cuttingCounter;
 
-    BaseCounter targetCounter = null;
-    private Vector2 moveDirection = Vector2.zero;
+    public PlayerCuttingState(PlayerStateMachine stateMachine) : base(stateMachine) { }
 
-    public PlayerCuttingState(PlayerStateMachine stateMachine, CuttingRecipeSO cuttingRecipeSO) : base(stateMachine)
+    public static PlayerMovingState Create(PlayerStateMachine stateMachine)
     {
-        this.cuttingRecipeSO = cuttingRecipeSO;
+        return new PlayerMovingState(
+            stateMachine,
+            new PlayerCuttingState(stateMachine),
+            stateMachine.GetNearestCounter<CuttingCounter>());
     }
 
     public override void Enter()
     {
-        Debug.Log($"Player {stateMachine.Player.name} entered Cutting State for {cuttingRecipeSO.input.name}");
-        stateMachine.Player.OnCounterSelected += Player_OnCounterSelected;
+        Debug.Log($"Player {stateMachine.Player.name} entered Cutting State");
 
-        (targetCounter, moveDirection) = stateMachine.GetNearestContainerCounterAndDirectionByIngredient(cuttingRecipeSO.input);
-
-        if (targetCounter == stateMachine.Player.GetSelectedCounter())
+        if (!stateMachine.Player.TryGetCuttingRecipe(stateMachine.Player.GetKitchenObject().GetKitchenObjectSO(), out var cuttingRecipeSO))
         {
-            Player_OnCounterSelected(stateMachine.Player.GetSelectedCounter());
-        }
-    }
+            Debug.LogError($"Cutting recipe not found for ingredient: {stateMachine.Player.GetKitchenObject().GetKitchenObjectSO().name}");
 
-    public override void Update()
-    {
-        if (moveDirection != Vector2.zero)
-        {
-            moveDirection = stateMachine.GetMoveDirection(targetCounter);
+            return;
         }
 
-        GameInput.Instance.Move(moveDirection);
-        GameInput.Instance.Dash();
+        GameInput.Instance.Interact();
+
+        cuttingCounter = stateMachine.Player.GetSelectedCounter() as CuttingCounter;
+        cuttingCounter.OnProgressChanged += CuttingCounter_OnProgressChanged;
+
+        GameInput.Instance.InteractAlternateStart();
     }
 
     public override void Exit()
     {
-        stateMachine.Player.OnCounterSelected -= Player_OnCounterSelected;
-        GameInput.Instance.Move(Vector2.zero);
+        if (cuttingCounter != null)
+        {
+            cuttingCounter.OnProgressChanged -= CuttingCounter_OnProgressChanged;
+        }
     }
 
-    private void Player_OnCounterSelected(BaseCounter selectedCounter)
+    private void CuttingCounter_OnProgressChanged(float progress)
     {
-        Debug.Log($"Cutting State selected counter: {selectedCounter.name}");
-
-        if (selectedCounter == targetCounter)
+        if (progress < 1f)
         {
-            moveDirection = Vector2.zero;
-        }
-
-        if (selectedCounter == targetCounter && selectedCounter is ContainerCounter)
-        {
-            targetCounter.Interact(stateMachine.Player);
-            (targetCounter, moveDirection) = stateMachine.GetNearestCounterAndDirection<CuttingCounter>();
-
             return;
         }
 
-        if (selectedCounter == targetCounter && selectedCounter is CuttingCounter)
-        {
-            targetCounter.Interact(stateMachine.Player);
+        GameInput.Instance.InteractAlternateEnd();
 
-            for (var i = 0; i < cuttingRecipeSO.cuttingProgressMax; i++)
-            {
-                targetCounter.InteractAlternate(stateMachine.Player);
-            }
+        GameInput.Instance.Interact();
 
-            targetCounter.Interact(stateMachine.Player);
-
-            targetCounter = stateMachine.Player.GetWorkingClearCounter();
-            moveDirection = stateMachine.GetMoveDirection(targetCounter);
-
-            return;
-        }
-
-        if (selectedCounter == targetCounter && selectedCounter is ClearCounter)
-        {
-            targetCounter.Interact(stateMachine.Player);
-            stateMachine.ChangeState(new PlayerRecipePlanState(stateMachine));
-
-            return;
-        }
-
-        moveDirection = stateMachine.GetMoveDirection(targetCounter);
+        stateMachine.ChangeState(PlayerPlaceOnPlateState.Create(stateMachine));
     }
 }

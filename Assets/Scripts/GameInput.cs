@@ -251,6 +251,21 @@ public class GameInput : MonoBehaviour
     {
         OnDashAction?.Invoke();
     }
+    
+    public void Interact()
+    {
+        Interact_performed(new CallbackContext());
+    }
+
+    public void InteractAlternateStart()
+    {
+        InteractAlternate_performed(new CallbackContext());
+    }
+
+    public void InteractAlternateEnd()
+    {
+        InteractAlternate_canceled(new CallbackContext());
+    }
 
     #endregion
 }

@@ -2,78 +2,32 @@ using UnityEngine;
 
 public class PlayerGetPlateState : BaseState<PlayerStateMachine>
 {
-    BaseCounter targetCounter = null;
-    private Vector2 moveDirection = Vector2.zero;
-
     public PlayerGetPlateState(PlayerStateMachine stateMachine) : base(stateMachine) { }
+
+    public static PlayerMovingState Create(PlayerStateMachine stateMachine)
+    {
+        return new PlayerMovingState(stateMachine,
+            new PlayerGetPlateState(stateMachine),
+            stateMachine.GetNearestCounter<PlatesCounter>());
+    }
 
     public override void Enter()
     {
         Debug.Log($"Player {stateMachine.Player.name} entered Get Plate State");
-        stateMachine.Player.OnCounterSelected += Player_OnCounterSelected;
 
-        (targetCounter, moveDirection) = stateMachine.GetNearestCounterAndDirection<PlatesCounter>();
+        GameInput.Instance.Interact();
 
-        if (targetCounter == stateMachine.Player.GetSelectedCounter())
+        if (stateMachine.Player.GetKitchenObject().TryGetPlate(out var plateKitchenObject))
         {
-            Player_OnCounterSelected(stateMachine.Player.GetSelectedCounter());
+            stateMachine.SetPlateKitchenObject(plateKitchenObject);
         }
-    }
-
-    public override void Update()
-    {
-        if (moveDirection != Vector2.zero)
+        else
         {
-            moveDirection = stateMachine.GetMoveDirection(targetCounter);
-        }
-
-        GameInput.Instance.Move(moveDirection);
-        GameInput.Instance.Dash();
-    }
-
-    public override void Exit()
-    {
-        stateMachine.Player.OnCounterSelected -= Player_OnCounterSelected;
-        GameInput.Instance.Move(Vector2.zero);
-    }
-
-    private void Player_OnCounterSelected(BaseCounter selectedCounter)
-    {
-        Debug.Log($"Get Plate State selected counter: {selectedCounter.name}");
-
-        if (selectedCounter == targetCounter)
-        {
-            moveDirection = Vector2.zero;
-        }
-
-        if (selectedCounter == targetCounter && selectedCounter is PlatesCounter)
-        {
-            targetCounter.Interact(stateMachine.Player);
-
-            if (stateMachine.Player.GetKitchenObject().TryGetPlate(out var plateKitchenObject))
-            {
-                stateMachine.SetPlateKitchenObject(plateKitchenObject);
-            }
-            else
-            {
-                Debug.LogError("PlayerGetPlateState: Player does not have a PlateKitchenObject after interacting with PlatesCounter.");
-            }
-
-            targetCounter = stateMachine.Player.GetWorkingClearCounter();
-            moveDirection = stateMachine.GetMoveDirection(targetCounter);
+            Debug.LogError("PlayerGetPlateState: Player does not have a PlateKitchenObject after interacting with PlatesCounter.");
 
             return;
         }
 
-        if (selectedCounter == targetCounter && selectedCounter is ClearCounter)
-        {
-            targetCounter.Interact(stateMachine.Player);
-
-            stateMachine.ChangeState(new PlayerRecipePlanState(stateMachine));
-
-            return;
-        }
-
-        moveDirection = stateMachine.GetMoveDirection(targetCounter);
+        stateMachine.ChangeState(PlayerPutOnCounterState.Create(stateMachine));
     }
 }

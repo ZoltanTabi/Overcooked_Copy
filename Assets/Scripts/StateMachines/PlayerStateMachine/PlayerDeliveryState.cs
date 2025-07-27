@@ -2,73 +2,45 @@ using UnityEngine;
 
 public class PlayerDeliveryState : BaseState<PlayerStateMachine>
 {
-    BaseCounter targetCounter = null;
-    private Vector2 moveDirection = Vector2.zero;
+    public PlayerDeliveryState(PlayerStateMachine stateMachine) : base(stateMachine) { }
 
-    public PlayerDeliveryState(PlayerStateMachine stateMachine) : base(stateMachine)
+    public static PlayerMovingState Init(PlayerStateMachine stateMachine)
     {
+        return new PlayerMovingState(stateMachine,
+            new PlayerDeliveryState(stateMachine),
+            stateMachine.Player.GetWorkingClearCounter());
+    }
+
+    public static PlayerMovingState Deliver(PlayerStateMachine stateMachine)
+    {
+        return new PlayerMovingState(stateMachine,
+            new PlayerDeliveryState(stateMachine),
+            stateMachine.GetNearestCounter<DeliveryCounter>());
     }
 
     public override void Enter()
     {
-        Debug.Log($"Player {stateMachine.Player.name} entered Delivery State");
-        stateMachine.Player.OnCounterSelected += Player_OnCounterSelected;
-
-        targetCounter = stateMachine.Player.GetWorkingClearCounter();
-        moveDirection = stateMachine.GetMoveDirection(targetCounter);
-
-        if (targetCounter == stateMachine.Player.GetSelectedCounter())
+        if (!stateMachine.Player.HasKitchenObject() || !stateMachine.Player.GetKitchenObject().TryGetPlate(out var _))
         {
-            Player_OnCounterSelected(stateMachine.Player.GetSelectedCounter());
-        }
-    }
+            Debug.Log($"Player {stateMachine.Player.name} does not have a PlateKitchenObject to deliver.");
 
-    public override void Update()
-    {
-        if (moveDirection != Vector2.zero)
+            GameInput.Instance.Interact();
+
+            stateMachine.ChangeState(Deliver(stateMachine));
+        }
+        else
         {
-            moveDirection = stateMachine.GetMoveDirection(targetCounter);
-        }
+            Debug.Log($"Player {stateMachine.Player.name} is delivering the plate.");
 
-        GameInput.Instance.Move(moveDirection);
-        GameInput.Instance.Dash();
+            GameInput.Instance.Interact();
+
+            DeliveryManager.Instance.OnRecipeDelivered += DeliveryManager_OnRecipeDelivered;
+        }
     }
 
     public override void Exit()
     {
-        stateMachine.Player.OnCounterSelected -= Player_OnCounterSelected;
         DeliveryManager.Instance.OnRecipeDelivered -= DeliveryManager_OnRecipeDelivered;
-        GameInput.Instance.Move(Vector2.zero);
-    }
-
-    private void Player_OnCounterSelected(BaseCounter selectedCounter)
-    {
-        Debug.Log($"Delivery State selected counter: {selectedCounter.name}");
-
-        if (selectedCounter == targetCounter)
-        {
-            moveDirection = Vector2.zero;
-        }
-
-        if (selectedCounter == targetCounter && selectedCounter is ClearCounter)
-        {
-            targetCounter.Interact(stateMachine.Player);
-
-            (targetCounter, moveDirection) = stateMachine.GetNearestCounterAndDirection<DeliveryCounter>();
-
-            return;
-        }
-
-        if (selectedCounter == targetCounter && selectedCounter is DeliveryCounter)
-        {
-            targetCounter.Interact(stateMachine.Player);
-
-            DeliveryManager.Instance.OnRecipeDelivered += DeliveryManager_OnRecipeDelivered;
-
-            return;
-        }
-
-        moveDirection = stateMachine.GetMoveDirection(targetCounter);
     }
 
     private void DeliveryManager_OnRecipeDelivered()

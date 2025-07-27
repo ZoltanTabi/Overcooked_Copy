@@ -7,6 +7,8 @@ public class PlayerStateMachine : BaseStateMachine<PlayerStateMachine>
     public bool IsStarted { get; private set; }
     public RecipeSO CurrentRecipe { get; private set; }
     public PlateKitchenObject PlateKitchenObject { get; private set; }
+    public StoveCounter StoveCounter { get; private set; } = null;
+    public bool IngredientIsReadyOnStove { get; private set; } = false;
 
     public PlayerStateMachine(Player player)
     {
@@ -30,13 +32,54 @@ public class PlayerStateMachine : BaseStateMachine<PlayerStateMachine>
 
     public void SetCurrentRecipe(RecipeSO recipeSO)
     {
-        PlateKitchenObject = null;
+        SetPlateKitchenObject(null);
         CurrentRecipe = recipeSO;
     }
 
     public void SetPlateKitchenObject(PlateKitchenObject plateKitchenObject)
     {
         PlateKitchenObject = plateKitchenObject;
+    }
+
+    public void PutIngredientOnStove(StoveCounter stoveCounter)
+    {
+        if (stoveCounter == null)
+        {
+            Debug.LogError("StoveCounter is null!");
+            return;
+        }
+
+        StoveCounter = stoveCounter;
+        StoveCounter.OnStateChanged += StoveCounter_OnStateChanged;
+    }
+
+    public void GetIngredientFromStove()
+    {
+        StoveCounter = null;
+        IngredientIsReadyOnStove = false;
+    }
+
+    private void StoveCounter_OnStateChanged(StoveCounter.StoveCounterState stoveCounterState)
+    {
+        StoveCounter.OnStateChanged -= StoveCounter_OnStateChanged;
+        
+        IngredientIsReadyOnStove = true;
+    }
+
+    public T GetNearestCounter<T>() where T : BaseCounter
+    {
+        var counters = Object.FindObjectsByType<T>(FindObjectsSortMode.None);
+
+        return GetClosestCounter(counters);
+    }
+
+    public ContainerCounter GetNearestContainerCounterByIngredient(KitchenObjectSO kitchenObjectSO)
+    {
+        var counters = Object.FindObjectsByType<ContainerCounter>(FindObjectsSortMode.None)
+            .Where(counter => counter.GetKitchenObjectSO() == kitchenObjectSO)
+            .ToArray();
+
+        return GetClosestCounter(counters);
     }
 
     public (T, Vector2) GetNearestCounterAndDirection<T>() where T : BaseCounter
@@ -64,12 +107,16 @@ public class PlayerStateMachine : BaseStateMachine<PlayerStateMachine>
 
     private (T, Vector2) GetClosestCounterAndDirection<T>(T[] counters) where T : BaseCounter
     {
-        var targetCounter = counters
-            .OrderBy(counter => Vector3.Distance(Player.transform.position, counter.transform.position))
-            .FirstOrDefault();
-
+        T targetCounter = GetClosestCounter(counters);
         Vector2 moveDirection = GetMoveDirection(targetCounter);
 
         return (targetCounter, moveDirection);
+    }
+
+    private T GetClosestCounter<T>(T[] counters) where T : BaseCounter
+    {
+        return counters
+            .OrderBy(counter => Vector3.Distance(Player.transform.position, counter.transform.position))
+            .FirstOrDefault();
     }
 }

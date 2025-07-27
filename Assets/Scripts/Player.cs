@@ -317,26 +317,16 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         return selectedCounter;
     }
 
-    public CuttingRecipeSO GetCuttingRecipeForOutput(KitchenObjectSO outputKitchenObjectSO)
+    public bool TryGetCuttingRecipe(KitchenObjectSO kitchenObjectSO, out CuttingRecipeSO cuttingRecipeSO)
     {
-        return cuttingRecipeSOs.FirstOrDefault(x => x.output == outputKitchenObjectSO);
-    }
-
-    public bool TryGetCuttingRecipeForOutput(KitchenObjectSO outputKitchenObjectSO, out CuttingRecipeSO cuttingRecipeSO)
-    {
-        cuttingRecipeSO = GetCuttingRecipeForOutput(outputKitchenObjectSO);
+        cuttingRecipeSO = cuttingRecipeSOs.SingleOrDefault(x => x.input == kitchenObjectSO || x.output == kitchenObjectSO);
 
         return cuttingRecipeSO != null;
     }
 
-    public FryingRecipeSO GetFryingRecipeForOutput(KitchenObjectSO outputKitchenObjectSO)
+    public bool TryGetFryingRecipe(KitchenObjectSO kitchenObjectSO, out FryingRecipeSO fryingRecipeSO)
     {
-        return fryingRecipeSOs.FirstOrDefault(x => x.output == outputKitchenObjectSO);
-    }
-    
-    public bool TryGetFryingRecipeForOutput(KitchenObjectSO outputKitchenObjectSO, out FryingRecipeSO fryingRecipeSO)
-    {
-        fryingRecipeSO = GetFryingRecipeForOutput(outputKitchenObjectSO);
+        fryingRecipeSO = fryingRecipeSOs.SingleOrDefault(x => x.input == kitchenObjectSO || x.output == kitchenObjectSO);
 
         return fryingRecipeSO != null;
     }

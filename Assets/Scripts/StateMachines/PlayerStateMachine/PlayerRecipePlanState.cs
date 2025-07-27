@@ -18,7 +18,7 @@ public class PlayerRecipePlanState : BaseState<PlayerStateMachine>
 
         if (stateMachine.PlateKitchenObject == null)
         {
-            stateMachine.ChangeState(new PlayerGetPlateState(stateMachine));
+            stateMachine.ChangeState(PlayerGetPlateState.Create(stateMachine));
 
             return;
         }
@@ -27,24 +27,54 @@ public class PlayerRecipePlanState : BaseState<PlayerStateMachine>
 
         if (!neededIngredients.Any())
         {
-            stateMachine.ChangeState(new PlayerDeliveryState(stateMachine));
+            stateMachine.ChangeState(PlayerDeliveryState.Init(stateMachine));
 
             return;
         }
 
-        var neededIngredient = neededIngredients.FirstOrDefault();
+        if (stateMachine.IngredientIsReadyOnStove)
+        {
+            stateMachine.ChangeState(PlayerGetFromStoveState.Create(stateMachine));
 
-        if (stateMachine.Player.TryGetCuttingRecipeForOutput(neededIngredient, out var cuttingRecipeSO))
-        {
-            stateMachine.ChangeState(new PlayerCuttingState(stateMachine, cuttingRecipeSO));
+            return;
         }
-        else if (stateMachine.Player.TryGetFryingRecipeForOutput(neededIngredient, out var fryingRecipeSO))
+
+        foreach (var neededIngredient in neededIngredients.OrderByDescending(x => stateMachine.Player.TryGetFryingRecipe(x, out var _)))
         {
-            stateMachine.ChangeState(new PlayerFryingState(stateMachine, fryingRecipeSO));
+            if (stateMachine.Player.TryGetCuttingRecipe(neededIngredient, out var cuttingRecipeSO))
+            {
+                var nextState = PlayerGetIngredientState.Create(stateMachine, PlayerCuttingState.Create(stateMachine), cuttingRecipeSO.input);
+                stateMachine.ChangeState(nextState);
+
+                break;
+            }
+            else if (stateMachine.Player.TryGetFryingRecipe(neededIngredient, out var fryingRecipeSO))
+            {
+                if (stateMachine.StoveCounter != null)
+                {
+                    continue;
+                }
+
+                var nextState = PlayerGetIngredientState.Create(stateMachine, PlayerPutOnStoveState.Create(stateMachine), fryingRecipeSO.input);
+                stateMachine.ChangeState(nextState);
+
+                break;
+            }
+            else
+            {
+                var nextState = PlayerGetIngredientState.Create(stateMachine, PlayerPlaceOnPlateState.Create(stateMachine), neededIngredient);
+                stateMachine.ChangeState(nextState);
+
+                break;
+            }
         }
-        else
+    }
+
+    public override void Update()
+    {
+        if (stateMachine.IngredientIsReadyOnStove)
         {
-            stateMachine.ChangeState(new PlayerGetIngredientState(stateMachine, neededIngredient));
+            stateMachine.ChangeState(PlayerGetFromStoveState.Create(stateMachine));
         }
     }
 }

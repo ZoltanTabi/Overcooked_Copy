@@ -3,23 +3,20 @@ using UnityEngine;
 
 public class PlayerIdleState : BaseState<PlayerStateMachine>
 {
-    public PlayerIdleState(PlayerStateMachine stateMachine) : base(stateMachine)
-    {
-
-    }
+    public PlayerIdleState(PlayerStateMachine stateMachine) : base(stateMachine) { }
 
     public override void Enter()
     {
         Debug.Log($"Player {stateMachine.Player.name} entered Idle State");
         GameInput.Instance.Move(Vector2.zero);
 
-        SetRecipeIfNull();
         DeliveryManager.Instance.OnRecipeSpawned += DeliveryManager_OnRecipeSpawned;
+        DeliveryManager_OnRecipeSpawned();
     }
 
     public override void Update()
     {
-        if (Input.GetKey(KeyCode.H))
+        if (Input.GetKeyDown(KeyCode.H))
         {
             Debug.Log($"Player {stateMachine.Player.name} pressed H key to start the state machine");
             stateMachine.Start();
@@ -37,11 +34,6 @@ public class PlayerIdleState : BaseState<PlayerStateMachine>
     }
 
     private void DeliveryManager_OnRecipeSpawned()
-    {
-        SetRecipeIfNull();
-    }
-
-    private void SetRecipeIfNull()
     {
         var recipeSO = DeliveryManager.Instance.GetWaitingRecipeSOs().FirstOrDefault();
 
