@@ -22,7 +22,7 @@ public class PlayerDeliveryState : BaseState<PlayerStateMachine>
     {
         if (!stateMachine.Player.HasKitchenObject() || !stateMachine.Player.GetKitchenObject().TryGetPlate(out var _))
         {
-            Debug.Log($"Player {stateMachine.Player.name} does not have a PlateKitchenObject to deliver.");
+            Debug.Log($"Player {stateMachine.Player.name} entered Delivery State: get the plate.");
 
             GameInput.Instance.Interact();
 
@@ -30,7 +30,7 @@ public class PlayerDeliveryState : BaseState<PlayerStateMachine>
         }
         else
         {
-            Debug.Log($"Player {stateMachine.Player.name} is delivering the plate.");
+            Debug.Log($"Player {stateMachine.Player.name} entered Delivery State: delivering the plate.");
 
             GameInput.Instance.Interact();
 
@@ -45,8 +45,6 @@ public class PlayerDeliveryState : BaseState<PlayerStateMachine>
 
     private void DeliveryManager_OnRecipeDelivered()
     {
-        DeliveryManager.Instance.OnRecipeDelivered -= DeliveryManager_OnRecipeDelivered;
-
         stateMachine.SetCurrentRecipe(null);
         stateMachine.ChangeState(new PlayerIdleState(stateMachine));
     }

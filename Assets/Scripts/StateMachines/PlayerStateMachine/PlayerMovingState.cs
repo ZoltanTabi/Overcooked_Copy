@@ -16,9 +16,8 @@ public class PlayerMovingState : BaseState<PlayerStateMachine>
     {
         Debug.Log($"Player {stateMachine.Player.name} entered Moving State to {targetCounter.name} and next state {nextState?.GetType().Name}");
 
-        stateMachine.Player.OnCounterSelected += Player_OnCounterSelected;
-
         moveDirection = GetMoveDirection();
+        stateMachine.Player.OnCounterSelected += Player_OnCounterSelected;
 
         Player_OnCounterSelected(stateMachine.Player.GetSelectedCounter());
     }

@@ -18,7 +18,7 @@ public class PlayerGetFromStoveState : BaseState<PlayerStateMachine>
 
         GameInput.Instance.Interact();
 
-        stateMachine.GetIngredientFromStove();
+        stateMachine.TakeIngredientFromStove();
 
         stateMachine.ChangeState(PlayerPlaceOnPlateState.Create(stateMachine));
     }

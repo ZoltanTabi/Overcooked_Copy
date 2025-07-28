@@ -18,13 +18,6 @@ public class PlayerCuttingState : BaseState<PlayerStateMachine>
     {
         Debug.Log($"Player {stateMachine.Player.name} entered Cutting State");
 
-        if (!stateMachine.Player.TryGetCuttingRecipe(stateMachine.Player.GetKitchenObject().GetKitchenObjectSO(), out var cuttingRecipeSO))
-        {
-            Debug.LogError($"Cutting recipe not found for ingredient: {stateMachine.Player.GetKitchenObject().GetKitchenObjectSO().name}");
-
-            return;
-        }
-
         GameInput.Instance.Interact();
 
         cuttingCounter = stateMachine.Player.GetSelectedCounter() as CuttingCounter;
@@ -35,10 +28,7 @@ public class PlayerCuttingState : BaseState<PlayerStateMachine>
 
     public override void Exit()
     {
-        if (cuttingCounter != null)
-        {
-            cuttingCounter.OnProgressChanged -= CuttingCounter_OnProgressChanged;
-        }
+        cuttingCounter.OnProgressChanged -= CuttingCounter_OnProgressChanged;
     }
 
     private void CuttingCounter_OnProgressChanged(float progress)

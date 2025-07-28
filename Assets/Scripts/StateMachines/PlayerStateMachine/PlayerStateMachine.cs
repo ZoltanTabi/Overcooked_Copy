@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using UnityEngine;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 using Object = UnityEngine.Object;
 
 public class PlayerStateMachine : BaseStateMachine<PlayerStateMachine>
@@ -47,17 +46,11 @@ public class PlayerStateMachine : BaseStateMachine<PlayerStateMachine>
         }
 
         StoveCounter = stoveCounter;
-        StoveCounter.OnStateChanged += StoveCounter_OnStateChanged;
     }
 
-    public void GetIngredientFromStove()
+    public void TakeIngredientFromStove()
     {
         StoveCounter = null;
-    }
-
-    private void StoveCounter_OnStateChanged(StoveCounter.StoveCounterState stoveCounterState)
-    {
-        StoveCounter.OnStateChanged -= StoveCounter_OnStateChanged;
     }
 
     public T GetNearestCounter<T>(Func<T, bool> predicate = null) where T : BaseCounter
