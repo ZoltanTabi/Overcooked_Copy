@@ -34,16 +34,14 @@ public class CuttingCounter : BaseCounter, IHasProgress
             OnCut?.Invoke();
             OnAnyCut?.Invoke(this);
 
-            InvokeProgressChanged(cuttingRecipeSO.cuttingProgressMax);
-
-            if (cuttingProgress < cuttingRecipeSO.cuttingProgressMax)
+            if (cuttingProgress >= cuttingRecipeSO.cuttingProgressMax)
             {
-                return true;
+                GetKitchenObject().DestroySelf();
+
+                KitchenObject.SpawnKitchenObject(cuttingRecipeSO.output, this);
             }
 
-            GetKitchenObject().DestroySelf();
-
-            KitchenObject.SpawnKitchenObject(cuttingRecipeSO.output, this);
+            InvokeProgressChanged(cuttingRecipeSO.cuttingProgressMax);
 
             return true;
         }

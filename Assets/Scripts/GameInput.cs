@@ -116,7 +116,7 @@ public class GameInput : MonoBehaviour
         inputVector = Vector2.zero;
         normalizedInputVector = Vector2.zero;
     }
-    
+
     private void Interact_performed(CallbackContext context)
     {
         OnInteractAction?.Invoke();
@@ -237,4 +237,35 @@ public class GameInput : MonoBehaviour
             })
             .Start();
     }
+
+
+    #region State Machine Methods
+
+    public void Move(Vector2 movementDirection)
+    {
+        inputVector = movementDirection;
+        normalizedInputVector = movementDirection.normalized;
+    }
+
+    public void Dash()
+    {
+        OnDashAction?.Invoke();
+    }
+    
+    public void Interact()
+    {
+        Interact_performed(new CallbackContext());
+    }
+
+    public void InteractAlternateStart()
+    {
+        InteractAlternate_performed(new CallbackContext());
+    }
+
+    public void InteractAlternateEnd()
+    {
+        InteractAlternate_canceled(new CallbackContext());
+    }
+
+    #endregion
 }

@@ -357,8 +357,13 @@ MonoBehaviour:
     m_Bits: 64
   kitchenObjectHoldPoint: {fileID: 182895126}
   throwableObjectContainerPrefab: {fileID: 8242434332887951438, guid: 0908384bb4ac1f348961c53fda2910b5, type: 3}
-  dashDurationTimer: 0
-  dashDurationTimerMax: 0.2
+  cuttingRecipeSOs:
+  - {fileID: 11400000, guid: e2bc2326e25874b43872bf052d5ec471, type: 2}
+  - {fileID: 11400000, guid: d6c32dd23dd794444a72ee2e799b0579, type: 2}
+  - {fileID: 11400000, guid: 067513e7c4373db478731b19ca2d66c5, type: 2}
+  fryingRecipeSOs:
+  - {fileID: 11400000, guid: 9f4c3e2058714f241a04b0d3fe83dbd6, type: 2}
+  workingClearCounter: {fileID: 410990517}
 --- !u!114 &58392202
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3936,6 +3941,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4710963106610667854, guid: 61c0afcbcf6d32b47b2e89183cd513e2, type: 3}
   m_PrefabInstance: {fileID: 1182730786}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &410990517 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5015679906077024645, guid: 61c0afcbcf6d32b47b2e89183cd513e2, type: 3}
+  m_PrefabInstance: {fileID: 1182730786}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32b1995f164004c4ebe3f6ffe6291954, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &413620894
 GameObject:
   m_ObjectHideFlags: 0
@@ -8745,7 +8761,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8785070779723031822, guid: 61c0afcbcf6d32b47b2e89183cd513e2, type: 3}
       propertyPath: m_Name
-      value: ClearCounter (6)
+      value: WorkingClearCounter
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

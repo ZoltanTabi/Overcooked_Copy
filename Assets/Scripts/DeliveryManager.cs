@@ -66,6 +66,7 @@ public class DeliveryManager : MonoBehaviour
 
         if (waitingRecipeSO == null)
         {
+            OnRecipeDelivered?.Invoke();
             OnRecipeFailed?.Invoke();
 
             return;

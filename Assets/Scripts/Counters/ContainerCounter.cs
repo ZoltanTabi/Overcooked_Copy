@@ -20,4 +20,9 @@ public class ContainerCounter : BaseCounter, IKitchenObjectParent
 
         return true;
     }
+
+    public KitchenObjectSO GetKitchenObjectSO()
+    {
+        return kitchenObjectSO;
+    }
 }

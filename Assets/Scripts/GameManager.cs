@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
     private bool isGamePaused = false;
     private float countdownToStartTimer = 3f;
     private float gamePlayingTimer;
-    private readonly float gamePlayingTimerMax = 20f;
+    private readonly float gamePlayingTimerMax = 60f;
 
     public event Action OnStateChanged;
     public event Action OnGamePaused;

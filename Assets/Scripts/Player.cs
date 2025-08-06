@@ -23,11 +23,18 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     private bool isWalking = false;
     private bool isDashing = false;
     private bool isDashCooldown = false;
-    public float dashDurationTimer = 0f;
-    public float dashDurationTimerMax = 0.2f;
+    private float dashDurationTimer = 0f;
+    private readonly float dashDurationTimerMax = 0.2f;
     private Vector3 lastInteractDirection = Vector3.zero;
     private BaseCounter selectedCounter;
     private KitchenObject kitchenObject;
+
+    // PLAYER STATE MACHINE
+    [Header("Player State Machine")]
+    [SerializeField] private CuttingRecipeSO[] cuttingRecipeSOs;
+    [SerializeField] private FryingRecipeSO[] fryingRecipeSOs;
+    [SerializeField] private ClearCounter workingClearCounter;
+    private PlayerStateMachine playerStateMachine;
 
     private float MoveDistance => moveSpeed * Time.deltaTime;
 
@@ -48,6 +55,10 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private void Start()
     {
+        // PLAYER STATE MACHINE
+        playerStateMachine = new PlayerStateMachine(this);
+        playerStateMachine.Initialize(new PlayerIdleState(playerStateMachine));
+
         gameInput.OnInteractAction += GameInput_OnInteractAction;
         gameInput.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
         gameInput.OnDashAction += GameInput_OnDashAction;
@@ -56,6 +67,9 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private void Update()
     {
+        // PLAYER STATE MACHINE
+        playerStateMachine.Update();
+
         if (isDashing)
         {
             dashDurationTimer += Time.deltaTime;
@@ -290,4 +304,32 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     {
         return kitchenObject != null;
     }
+
+    #region State Machine Methods
+
+    public ClearCounter GetWorkingClearCounter()
+    {
+        return workingClearCounter;
+    }
+
+    public BaseCounter GetSelectedCounter()
+    {
+        return selectedCounter;
+    }
+
+    public bool TryGetCuttingRecipe(KitchenObjectSO kitchenObjectSO, out CuttingRecipeSO cuttingRecipeSO)
+    {
+        cuttingRecipeSO = cuttingRecipeSOs.SingleOrDefault(x => x.input == kitchenObjectSO || x.output == kitchenObjectSO);
+
+        return cuttingRecipeSO != null;
+    }
+
+    public bool TryGetFryingRecipe(KitchenObjectSO kitchenObjectSO, out FryingRecipeSO fryingRecipeSO)
+    {
+        fryingRecipeSO = fryingRecipeSOs.SingleOrDefault(x => x.input == kitchenObjectSO || x.output == kitchenObjectSO);
+
+        return fryingRecipeSO != null;
+    }
+
+    #endregion
 }
